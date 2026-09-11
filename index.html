@@ -38,9 +38,57 @@
         <button onclick="alternarAba('telaRanking')" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-blue-600 hover:bg-blue-500 text-white shadow transition flex items-center gap-1.5">
           <span>🏆</span> Placar / Ranking
         </button>
+        <!-- BOTÃO DE ACESSO DO PROFESSOR -->
+        <button onclick="solicitarAcessoAdmin()" class="px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-slate-950 hover:bg-slate-800 text-slate-400 hover:text-amber-300 border border-slate-800 transition flex items-center gap-1">
+          <span>⚙️</span> Docente
+        </button>
       </div>
     </div>
   </header>
+
+  <!-- MODAL / PAINEL ADMINISTRATIVO DO PROFESSOR -->
+  <div id="modalAdmin" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-xl w-full p-6 space-y-5 shadow-2xl">
+      <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+        <div>
+          <h3 class="text-lg font-bold text-white flex items-center gap-2">
+            <span>🛡️</span> Painel de Controle Docente
+          </h3>
+          <p class="text-xs text-slate-400">Gerenciamento direto do banco de dados em tempo real</p>
+        </div>
+        <button onclick="fecharModalAdmin()" class="text-slate-400 hover:text-white font-bold text-lg">&times;</button>
+      </div>
+
+      <!-- Gerenciamento de Temas -->
+      <div class="space-y-3">
+        <div class="flex justify-between items-center">
+          <h4 class="text-xs font-bold uppercase tracking-wider text-slate-300">Status Atual dos 10 Temas</h4>
+          <button onclick="liberarTodosOsTemas()" class="text-[11px] bg-rose-950 hover:bg-rose-900 text-rose-300 border border-rose-800 px-2.5 py-1 rounded transition">
+            Liberar TODOS os Temas
+          </button>
+        </div>
+
+        <div id="listaTemasAdmin" class="max-h-60 overflow-y-auto space-y-2 pr-1 custom-scrollbar text-xs">
+          <!-- Injetado dinamicamente -->
+        </div>
+      </div>
+
+      <!-- Gerenciamento do Ranking -->
+      <div class="pt-3 border-t border-slate-800 flex justify-between items-center">
+        <div>
+          <span class="text-xs font-semibold text-slate-300 block">Zerar Placar / Ranking</span>
+          <span class="text-[11px] text-slate-500">Exclui todas as notas e histórico de testes</span>
+        </div>
+        <button onclick="zerarPlacarRanking()" class="text-xs bg-amber-950 hover:bg-amber-900 text-amber-300 border border-amber-800 px-3 py-1.5 rounded-lg transition font-semibold">
+          Zerar Ranking
+        </button>
+      </div>
+
+      <div class="pt-2 text-right">
+        <button onclick="fecharModalAdmin()" class="bg-slate-800 hover:bg-slate-700 text-white text-xs px-4 py-2 rounded-lg transition">Fechar Painel</button>
+      </div>
+    </div>
+  </div>
 
   <!-- CONTEÚDO PRINCIPAL -->
   <main class="flex-grow max-w-6xl w-full mx-auto p-4 md:p-6 space-y-6">
@@ -205,6 +253,8 @@
 
   <script>
     const FIREBASE_URL = "https://aula-1929a-default-rtdb.firebaseio.com/";
+    // SENHA DO PROFESSOR (Altere aqui se desejar outra senha)
+    const SENHA_ADMIN = "senai2026";
 
     let temaAtivo = null;
     let dadosDupla = { aluno1: "", aluno2: "" };
@@ -225,7 +275,84 @@
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
-    // Identifica se havia uma sessão ativa gravada no aparelho
+    // ==========================================
+    // FUNÇÕES DO PAINEL DOCENTE / ADMIN
+    // ==========================================
+    function solicitarAcessoAdmin() {
+      const senha = prompt("Acesso Restrito ao Professor.\nDigite a senha mestra:");
+      if (senha === SENHA_ADMIN) {
+        abrirModalAdmin();
+      } else if (senha !== null) {
+        alert("Senha incorreta!");
+      }
+    }
+
+    function abrirModalAdmin() {
+      atualizarListaAdmin();
+      document.getElementById('modalAdmin').classList.remove('hidden');
+    }
+
+    function fecharModalAdmin() {
+      document.getElementById('modalAdmin').classList.add('hidden');
+    }
+
+    function atualizarListaAdmin() {
+      const container = document.getElementById('listaTemasAdmin');
+      container.innerHTML = "";
+
+      window.BANCO_TEMAS.forEach(t => {
+        const ocupadoPor = temasOcupadosCache[t.id];
+        const item = document.createElement('div');
+        item.className = "flex justify-between items-center p-2.5 rounded-xl border " + 
+          (ocupadoPor ? "bg-slate-950 border-rose-900/60" : "bg-slate-950/60 border-slate-800");
+
+        item.innerHTML = `
+          <div>
+            <span class="font-bold text-slate-200">#${t.id} - ${t.nome}</span>
+            <span class="block text-[11px] ${ocupadoPor ? 'text-rose-400 font-medium' : 'text-emerald-400'}">
+              ${ocupadoPor ? `Ocupado por: ${ocupadoPor}` : 'Livre'}
+            </span>
+          </div>
+          ${
+            ocupadoPor 
+              ? `<button onclick="liberarTemaIndividual(${t.id})" class="bg-rose-900 hover:bg-rose-800 text-rose-100 px-2.5 py-1 rounded text-xs font-semibold transition">Liberar</button>`
+              : `<span class="text-xs text-slate-600 font-mono">Disponível</span>`
+          }
+        `;
+        container.appendChild(item);
+      });
+    }
+
+    async function liberarTemaIndividual(temaId) {
+      if (confirm(`Liberar o Tema #${temaId}? Ele ficará disponível imediatamente para qualquer dupla.`)) {
+        await fetch(`${FIREBASE_URL}/temas_ocupados/${temaId}.json`, { method: 'DELETE' });
+        delete temasOcupadosCache[temaId];
+        atualizarListaAdmin();
+        renderizarPainelTemas();
+      }
+    }
+
+    async function liberarTodosOsTemas() {
+      if (confirm("ATENÇÃO: Deseja desocupar TODOS os 10 temas de uma vez?")) {
+        await fetch(`${FIREBASE_URL}/temas_ocupados.json`, { method: 'DELETE' });
+        temasOcupadosCache = {};
+        atualizarListaAdmin();
+        renderizarPainelTemas();
+        alert("Todos os temas foram liberados!");
+      }
+    }
+
+    async function zerarPlacarRanking() {
+      if (confirm("ATENÇÃO: Deseja apagar todas as notas do ranking? O placar ficará zerado.")) {
+        await fetch(`${FIREBASE_URL}/ranking.json`, { method: 'DELETE' });
+        atualizarVisualRanking([]);
+        alert("O ranking foi reiniciado com sucesso!");
+      }
+    }
+
+    // ==========================================
+    // PERSISTÊNCIA E RECUPERAÇÃO DE SESSÃO
+    // ==========================================
     function checarSessaoEmAndamento() {
       const sessaoRaw = localStorage.getItem('tms_sessao_ativa');
       if (!sessaoRaw) return;
@@ -284,7 +411,6 @@
         const ocupadoPor = ocupados[tema.id];
         if (!ocupadoPor) livres++;
 
-        // Checa se os nomes digitados batem com os nomes que travaram o tema
         const souDono = ocupadoPor && minhaIdentificacao && (ocupadoPor.toLowerCase() === minhaIdentificacao);
 
         const card = document.createElement('div');
@@ -345,19 +471,16 @@
         const resChecagem = await fetch(`${FIREBASE_URL}/temas_ocupados/${temaId}.json`);
         const ocupado = await resChecagem.json();
         
-        // Se estiver ocupado por outra pessoa, bloqueia
         if (ocupado && ocupado.toLowerCase() !== identificacao.toLowerCase()) {
           alert(`Este tema acabou de ser travado pela dupla: ${ocupado}! Escolha outro cenário.`);
           return;
         }
 
-        // Grava no Firebase
         await fetch(`${FIREBASE_URL}/temas_ocupados/${temaId}.json`, {
           method: 'PUT',
           body: JSON.stringify(identificacao)
         });
 
-        // Salva a sessão no LocalStorage para imunidade contra F5
         salvarSessaoLocal(temaId);
 
       } catch (e) {
@@ -514,7 +637,6 @@
         console.error(err);
       }
 
-      // Limpa a sessão ativa após a entrega definitiva
       localStorage.removeItem('tms_sessao_ativa');
       document.getElementById('bannerSessaoRecuperada').classList.add('hidden');
 
@@ -554,6 +676,9 @@
           temasOcupadosCache = dados || {};
           if (document.getElementById('telaSelecao').offsetParent !== null) {
             renderizarPainelTemas(temasOcupadosCache);
+          }
+          if (!document.getElementById('modalAdmin').classList.contains('hidden')) {
+            atualizarListaAdmin();
           }
         } catch(e) {}
       }, 3000);

@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Desafio Logístico TMS // Estação Avulsa</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Usa o mesmo banco de questões já hospedado -->
+  <script src="questoes.js"></script>
+  <style>
+    @media print {
+      body * { visibility: hidden; }
+      #areaRelatorioImpressao, #areaRelatorioImpressao * { visibility: visible; }
+      #areaRelatorioImpressao { position: absolute; left: 0; top: 0; width: 100%; }
+      .no-print { display: none !important; }
+    }
+    .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+    .custom-scrollbar::-webkit-scrollbar-track { background: #1e293b; }
+    .custom-scrollbar::-webkit-scrollbar-thumb { background: #3b82f6; border-radius: 3px; }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col font-sans selection:bg-blue-600 selection:text-white">
+
+  <!-- CABEÇALHO -->
+  <header class="bg-slate-900 border-b border-slate-800 p-4 sticky top-0 z-50 shadow-lg">
+    <div class="max-w-6xl mx-auto flex flex-wrap justify-between items-center gap-3">
+      <div class="flex items-center gap-3">
+        <span class="w-3 h-3 bg-amber-400 rounded-full animate-pulse"></span>
+        <div>
+          <h1 class="text-lg md:text-xl font-black tracking-wide text-white uppercase">TMS AUDIT // ESTAÇÃO OPERACIONAL AVULSA</h1>
+          <p class="text-xs text-slate-400">Ambiente Autônomo &bull; Processamento Local &bull; 35 Questões</p>
+        </div>
+      </div>
+      <div>
+        <span class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-amber-950/60 text-amber-300 border border-amber-800">
+          Terminal Independente
+        </span>
+      </div>
+    </div>
+  </header>
+
+  <!-- CONTEÚDO PRINCIPAL -->
+  <main class="flex-grow max-w-6xl w-full mx-auto p-4 md:p-6 space-y-6">
+
+    <div class="no-print bg-slate-900/80 border border-slate-800 px-4 py-2.5 rounded-xl flex items-center justify-between text-xs">
+      <div class="flex items-center gap-2">
+        <span class="w-2.5 h-2.5 rounded-full bg-amber-400"></span>
+        <span class="text-slate-300">Modo de Operação: <strong>Avaliação Individual / Local (Livre escolha de tema)</strong></span>
+      </div>
+      <span class="text-slate-500 font-mono text-[11px]">35 Questões &bull; Escala 0 a 10</span>
+    </div>
+
+    <!-- TELA 1: CADASTRO E SELEÇÃO DE TEMA -->
+    <section id="telaSelecao" class="space-y-6">
+      <div class="bg-slate-900 border border-slate-800 p-5 md:p-6 rounded-2xl shadow-sm">
+        <div class="flex items-center gap-3 mb-2">
+          <span class="w-7 h-7 rounded-lg bg-blue-600/20 text-blue-400 border border-blue-500/30 flex items-center justify-center font-bold text-xs">1</span>
+          <h2 class="text-base md:text-lg font-bold text-white">Identificação da Dupla</h2>
+        </div>
+        <p class="text-xs text-slate-400 mb-4">Insira o nome dos dois integrantes da dupla e selecione qualquer um dos cenários abaixo para realizar a avaliação.</p>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold text-slate-400 mb-1">Aluno 1:</label>
+            <input type="text" id="campoAluno1" placeholder="Ex.: Aluno A" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2.5 text-sm text-white focus:border-blue-500 outline-none">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-400 mb-1">Aluno 2:</label>
+            <input type="text" id="campoAluno2" placeholder="Ex.: Aluno B" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2.5 text-sm text-white focus:border-blue-500 outline-none">
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div class="flex justify-between items-center mb-3">
+          <div class="flex items-center gap-3">
+            <span class="w-7 h-7 rounded-lg bg-blue-600/20 text-blue-400 border border-blue-500/30 flex items-center justify-center font-bold text-xs">2</span>
+            <h2 class="text-base md:text-lg font-bold text-white">Escolha o Tema de Trabalho</h2>
+          </div>
+          <span class="text-xs font-mono bg-slate-800 text-slate-300 px-2.5 py-1 rounded-full border border-slate-700">Livre escolha</span>
+        </div>
+
+        <div id="gridTemas" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+      </div>
+    </section>
+
+    <!-- TELA 2: QUESTIONÁRIO (35 QUESTÕES) -->
+    <section id="telaQuestoes" class="hidden space-y-6">
+      <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl sticky top-20 z-40 shadow-xl backdrop-blur-md bg-slate-900/95">
+        <div class="flex flex-wrap justify-between items-center gap-3">
+          <div>
+            <span id="badgeTemaQuestoes" class="text-[10px] font-mono uppercase bg-blue-950 text-blue-400 px-2 py-0.5 rounded border border-blue-800">Tema 00</span>
+            <h3 id="tituloTemaQuestoes" class="text-base md:text-lg font-bold text-white mt-1"></h3>
+            <p id="subtituloDuplaQuestoes" class="text-xs text-slate-400"></p>
+          </div>
+          <div class="text-right">
+            <span class="text-xs text-slate-400 block">Progresso da Prova:</span>
+            <span id="contadorRespondidas" class="text-lg font-mono font-black text-emerald-400">0 / 35</span>
+          </div>
+        </div>
+        <div class="w-full bg-slate-800 h-2 rounded-full mt-3 overflow-hidden">
+          <div id="barraProgresso" class="bg-gradient-to-r from-blue-500 to-emerald-500 h-full w-0 transition-all duration-300"></div>
+        </div>
+      </div>
+
+      <form id="formQuestoes" class="space-y-4">
+        <div id="listaQuestoesContainer" class="space-y-4"></div>
+        <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl flex flex-col md:flex-row justify-between items-center gap-3">
+          <button type="button" onclick="cancelarVoltar()" class="text-xs text-slate-400 hover:text-white underline">&larr; Escolher Outro Tema</button>
+          <button type="submit" class="w-full md:w-auto bg-emerald-600 hover:bg-emerald-500 text-white font-black px-8 py-3.5 rounded-xl shadow-lg transition text-sm flex items-center justify-center gap-2">
+            <span>FINALIZAR AUDITORIA & EMITIR LAUDO</span> &rarr;
+          </button>
+        </div>
+      </form>
+    </section>
+
+    <!-- TELA 3: LAUDO TÉCNICO INDIVIDUAL -->
+    <section id="telaResultado" class="hidden space-y-6">
+      <div id="areaRelatorioImpressao" class="bg-slate-900 border border-slate-800 p-6 md:p-8 rounded-2xl space-y-6">
+        
+        <!-- MENSAGEM DO PROFESSOR -->
+        <div class="bg-gradient-to-br from-blue-950/70 via-slate-900 to-slate-900 border border-blue-800/60 p-5 md:p-6 rounded-2xl relative overflow-hidden shadow-md">
+          <div class="absolute -right-6 -bottom-6 text-8xl text-blue-600/10 font-serif select-none pointer-events-none">”</div>
+          <div class="flex items-center gap-2 text-amber-400 text-xs font-bold uppercase tracking-wider mb-2">
+            <span>⭐</span> Palavra do Professor à Dupla
+          </div>
+          <h4 class="text-white text-base md:text-lg font-bold mb-2">Parabéns pelo empenho e dedicação operacional!</h4>
+          <p class="text-xs md:text-sm text-slate-300 leading-relaxed italic mb-4">
+            "A gestão de cargas vai muito além do transporte de volumes de um ponto a outro; ela é a engrenagem que move a economia, exige respeito irrestrito à vida, às normas viárias e à integridade de cada processo. Cada decisão tomada neste desafio simula a responsabilidade real que estará nas mãos de vocês no mercado. Confiem na capacidade analítica de vocês, aprendam com cada ponto deste laudo e defendam o seu planejamento com firmeza técnica!"
+          </p>
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1 pt-3 border-t border-blue-800/40 text-xs">
+            <span class="text-blue-300 font-semibold font-mono">Prof. Stepherson Licetti Fontoura</span>
+            <span class="text-slate-400 text-[11px]">Especialista em Trânsito, Direito e Educação | Consultor Logístico</span>
+          </div>
+        </div>
+
+        <div class="border-b border-slate-800 pb-4 flex flex-col md:flex-row justify-between items-start md:items-end gap-3">
+          <div>
+            <span class="text-xs font-mono text-blue-400 uppercase tracking-wider">Certificado de Avaliação Operacional</span>
+            <h2 class="text-2xl font-black text-white mt-1">LAUDO TÉCNICO DE EXPEDIÇÃO</h2>
+            <p class="text-xs text-slate-400 mt-1">UC Gestão de Cargas &bull; Auditoria de Parâmetros Operacionais</p>
+          </div>
+          <div class="text-left md:text-right bg-slate-950 p-3.5 rounded-xl border border-slate-800">
+            <span class="text-[11px] text-slate-400 block uppercase font-mono">Nota Técnica Final</span>
+            <span id="scoreFinalNumero" class="text-3xl md:text-4xl font-black font-mono">0.0</span>
+            <span class="text-xs text-slate-500 block">Escala de 0 a 10 (35 Q.)</span>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs bg-slate-950 p-4 rounded-xl border border-slate-800/80">
+          <div><strong class="text-slate-400 block">Dupla:</strong> <span id="resDuplaNome" class="text-white font-semibold"></span></div>
+          <div><strong class="text-slate-400 block">Cenário Auditado:</strong> <span id="resTemaNome" class="text-white font-semibold"></span></div>
+          <div><strong class="text-slate-400 block">Data/Hora de Registro:</strong> <span id="resHoraEntrega" class="text-white font-mono"></span></div>
+        </div>
+
+        <div>
+          <h3 class="text-sm font-bold uppercase tracking-wide text-slate-300 mb-3">Diagnóstico Questão a Questão:</h3>
+          <div id="resGabaritoDetalhado" class="space-y-3 text-xs max-h-[450px] overflow-y-auto pr-2 custom-scrollbar"></div>
+        </div>
+
+        <div class="flex flex-wrap justify-between items-center gap-3 pt-4 border-t border-slate-800 no-print">
+          <button onclick="window.print()" class="bg-blue-600 hover:bg-blue-500 text-white font-bold px-6 py-2.5 rounded-lg text-xs transition flex items-center gap-1.5">
+            <span>🖨️</span> Imprimir / Salvar Laudo em PDF
+          </button>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- RODAPÉ -->
+  <footer class="text-center py-6 px-4 text-xs text-slate-500 border-t border-slate-900 no-print space-y-1.5 bg-slate-950">
+    <p class="text-slate-400">
+      Simulador de Gestão de Cargas &bull; Desenvolvido com dedicação pedagógica pelo <strong>Prof. Stepherson Fontoura</strong>
+    </p>
+    <p class="text-[11px] text-slate-600">
+      Especialista em Trânsito, Direito e Educação &bull; Projetado para Aulas Práticas de Logística (2026)
+    </p>
+  </footer>
+
+  <script>
+    let temaAtivo = null;
+    let dadosDupla = { aluno1: "", aluno2: "" };
+
+    window.addEventListener('DOMContentLoaded', () => {
+      renderizarPainelTemas();
+    });
+
+    function alternarAba(abaId) {
+      ['telaSelecao', 'telaQuestoes', 'telaResultado'].forEach(id => {
+        document.getElementById(id).classList.add('hidden');
+      });
+      document.getElementById(abaId).classList.remove('hidden');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function renderizarPainelTemas() {
+      const grid = document.getElementById('gridTemas');
+      grid.innerHTML = "";
+
+      window.BANCO_TEMAS.forEach(tema => {
+        const card = document.createElement('div');
+        card.className = "p-5 rounded-2xl border bg-slate-900 border-slate-800 hover:border-blue-500 shadow-sm flex flex-col justify-between transition";
+
+        card.innerHTML = `
+          <div>
+            <div class="flex justify-between items-start mb-2">
+              <span class="text-[10px] font-mono px-2 py-0.5 rounded-md font-bold bg-emerald-950 text-emerald-400 border border-emerald-800">
+                DISPONÍVEL
+              </span>
+              <span class="text-xs text-slate-500 font-mono">#${String(tema.id).padStart(2, '0')}</span>
+            </div>
+            <h3 class="font-bold text-white text-sm md:text-base mb-1">${tema.nome}</h3>
+            <p class="text-xs text-slate-400 leading-relaxed mb-4">${tema.desc}</p>
+          </div>
+          <div>
+            <button onclick="escolherTema(${tema.id})" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-2.5 rounded-xl text-xs transition shadow-md">
+              Selecionar Este Cenário &rarr;
+            </button>
+          </div>
+        `;
+        grid.appendChild(card);
+      });
+    }
+
+    function escolherTema(temaId) {
+      const a1 = document.getElementById('campoAluno1').value.trim();
+      const a2 = document.getElementById('campoAluno2').value.trim();
+
+      if (!a1 || !a2) {
+        alert("Atenção: É obrigatório informar o nome dos DOIS integrantes da dupla!");
+        document.getElementById('campoAluno1').focus();
+        return;
+      }
+
+      dadosDupla = { aluno1: a1, aluno2: a2 };
+      temaAtivo = window.BANCO_TEMAS.find(t => t.id === temaId);
+      carregarQuestionario();
+    }
+
+    function carregarQuestionario() {
+      document.getElementById('badgeTemaQuestoes').innerText = `Cenário #${String(temaAtivo.id).padStart(2, '0')} • 35 Questões`;
+      document.getElementById('tituloTemaQuestoes').innerText = temaAtivo.nome;
+      document.getElementById('subtituloDuplaQuestoes').innerText = `Dupla Operacional: ${dadosDupla.aluno1} e ${dadosDupla.aluno2}`;
+
+      const container = document.getElementById('listaQuestoesContainer');
+      container.innerHTML = "";
+
+      temaAtivo.questoes.forEach((q) => {
+        const cardQ = document.createElement('div');
+        cardQ.className = "bg-slate-900 border border-slate-800 p-5 rounded-2xl space-y-3";
+        cardQ.id = `bloco_questao_${q.id}`;
+
+        const optionsHtml = ['A', 'B', 'C', 'D'].map(letra => `
+          <label class="flex items-start gap-2.5 p-2.5 bg-slate-950 rounded-xl border border-slate-800 hover:border-slate-700 cursor-pointer transition">
+            <input type="radio" name="resp_${q.id}" value="${letra}" onchange="atualizarProgresso()" class="mt-0.5 text-blue-600">
+            <span class="text-slate-300"><strong class="text-white font-mono">(${letra})</strong> ${q.opcoes[letra]}</span>
+          </label>
+        `).join('');
+
+        cardQ.innerHTML = `
+          <div class="flex justify-between items-center border-b border-slate-800 pb-2">
+            <span class="text-xs font-mono font-bold text-blue-400">QUESTÃO ${String(q.id).padStart(2, '0')} / 35</span>
+            <span class="text-[11px] font-mono text-slate-500 uppercase">~0,285 pts</span>
+          </div>
+          <p class="text-sm font-semibold text-slate-100 leading-snug">${q.enunciado}</p>
+          <div class="space-y-2 pt-1 text-xs">${optionsHtml}</div>
+        `;
+        container.appendChild(cardQ);
+      });
+
+      atualizarProgresso();
+      alternarAba('telaQuestoes');
+    }
+
+    function atualizarProgresso() {
+      if (!temaAtivo) return;
+      let preenchidas = 0;
+      temaAtivo.questoes.forEach(q => {
+        if (document.querySelector(`input[name="resp_${q.id}"]:checked`)) preenchidas++;
+      });
+      document.getElementById('contadorRespondidas').innerText = `${preenchidas} / 35`;
+      document.getElementById('barraProgresso').style.width = `${(preenchidas / 35) * 100}%`;
+    }
+
+    function cancelarVoltar() {
+      if (confirm("Deseja escolher outro tema?")) {
+        temaAtivo = null;
+        alternarAba('telaSelecao');
+      }
+    }
+
+    document.getElementById('formQuestoes').addEventListener('submit', function(e) {
+      e.preventDefault();
+
+      let faltantes = [];
+      temaAtivo.questoes.forEach(q => {
+        if (!document.querySelector(`input[name="resp_${q.id}"]:checked`)) faltantes.push(q.id);
+      });
+
+      if (faltantes.length > 0) {
+        alert(`Atenção: Existem ${faltantes.length} questões sem resposta! Responda todas antes de enviar.`);
+        document.getElementById(`bloco_questao_${faltantes[0]}`).scrollIntoView({ behavior: 'smooth', block: 'center' });
+        return;
+      }
+
+      let acertos = 0;
+      let diagnostico = [];
+
+      temaAtivo.questoes.forEach(q => {
+        const marcada = document.querySelector(`input[name="resp_${q.id}"]:checked`).value;
+        const correto = (marcada === q.correta);
+        if (correto) acertos++;
+
+        diagnostico.push({
+          numero: q.id,
+          enunciado: q.enunciado,
+          marcada: marcada,
+          correta: q.correta,
+          acertou: correto,
+          explicacao: q.explicacao
+        });
+      });
+
+      const notaDecimal = ((acertos / 35) * 10).toFixed(1);
+      const agoraStr = new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+
+      document.getElementById('resDuplaNome').innerText = `${dadosDupla.aluno1} e ${dadosDupla.aluno2}`;
+      document.getElementById('resTemaNome').innerText = temaAtivo.nome;
+      document.getElementById('resHoraEntrega').innerText = agoraStr;
+
+      const scoreEl = document.getElementById('scoreFinalNumero');
+      scoreEl.innerText = `${notaDecimal}`;
+      scoreEl.className = "text-4xl font-black font-mono " + (parseFloat(notaDecimal) >= 7.0 ? "text-emerald-400" : "text-amber-400");
+
+      const diagContainer = document.getElementById('resGabaritoDetalhado');
+      diagContainer.innerHTML = "";
+      diagnostico.forEach(d => {
+        const div = document.createElement('div');
+        div.className = "p-3 rounded-xl border " + (d.acertou ? "bg-emerald-950/20 border-emerald-800/50 text-emerald-200" : "bg-rose-950/20 border-rose-800/50 text-rose-200");
+        div.innerHTML = `
+          <div class="flex justify-between items-center mb-1">
+            <span class="font-mono font-bold">Questão ${d.numero}: ${d.acertou ? '✔️ ACERTOU' : '❌ ERROU'}</span>
+            <span class="font-mono text-[10px]">Marcou (${d.marcada}) • Correta: (${d.correta})</span>
+          </div>
+          <p class="text-[11px] text-slate-300 mb-1">${d.enunciado}</p>
+          <p class="text-[11px] italic text-slate-400 font-sans">💡 Fundamento: ${d.explicacao}</p>
+        `;
+        diagContainer.appendChild(div);
+      });
+
+      alert(`Auditoria Finalizada com Sucesso!\nNota: ${notaDecimal} / 10.0\nSeu laudo foi gerado!`);
+      alternarAba('telaResultado');
+    });
+  </script>
+</body>
+</html>

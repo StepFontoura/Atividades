@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Desafio Logístico TMS // Gestão de Cargas</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Carrega as 350 questões do arquivo externo -->
+  <script src="questoes.js"></script>
   <style>
     @media print {
       body * { visibility: hidden; }
@@ -19,7 +21,7 @@
 </head>
 <body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col font-sans selection:bg-blue-600 selection:text-white">
 
-  <!-- CABEÇALHO GLOBAL -->
+  <!-- CABEÇALHO -->
   <header class="bg-slate-900 border-b border-slate-800 p-4 sticky top-0 z-50 shadow-lg">
     <div class="max-w-6xl mx-auto flex flex-wrap justify-between items-center gap-3">
       <div class="flex items-center gap-3">
@@ -43,16 +45,15 @@
   <!-- CONTEÚDO PRINCIPAL -->
   <main class="flex-grow max-w-6xl w-full mx-auto p-4 md:p-6 space-y-6">
 
-    <!-- STATUS DO SISTEMA -->
-    <div id="bannerConexao" class="no-print bg-slate-900/80 border border-slate-800 px-4 py-2.5 rounded-xl flex items-center justify-between text-xs">
+    <div class="no-print bg-slate-900/80 border border-slate-800 px-4 py-2.5 rounded-xl flex items-center justify-between text-xs">
       <div class="flex items-center gap-2">
-        <span id="pontoConexao" class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
-        <span id="textoConexao" class="text-slate-300">Modo de Operação: <strong>Sincronização em Tempo Real Ativa (Firebase)</strong></span>
+        <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+        <span class="text-slate-300">Modo de Operação: <strong>Sincronização em Tempo Real Ativa (Firebase)</strong></span>
       </div>
       <span class="text-slate-500 font-mono text-[11px]">35 Questões/Tema &bull; Escala 0 a 10 &bull; 10 Duplas</span>
     </div>
 
-    <!-- TELA 1: CADASTRO DA DUPLA E ESCOLHA DO TEMA -->
+    <!-- TELA 1: CADASTRO E SELEÇÃO DE TEMA -->
     <section id="telaSelecao" class="space-y-6">
       <div class="bg-slate-900 border border-slate-800 p-5 md:p-6 rounded-2xl shadow-sm">
         <div class="flex items-center gap-3 mb-2">
@@ -79,9 +80,12 @@
             <span class="w-7 h-7 rounded-lg bg-blue-600/20 text-blue-400 border border-blue-500/30 flex items-center justify-center font-bold text-xs">2</span>
             <h2 class="text-base md:text-lg font-bold text-white">Seleção Exclusiva de Cenário Operacional</h2>
           </div>
-          <span id="contadorLivres" class="text-xs font-mono bg-slate-800 text-slate-300 px-2.5 py-1 rounded-full border border-slate-700">Carregando...</span>
+          <span id="contadorLivres" class="text-xs font-mono bg-slate-800 text-slate-300 px-2.5 py-1 rounded-full border border-slate-700">10 temas disponíveis</span>
         </div>
-        <div id="gridTemas" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+
+        <div id="gridTemas" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <!-- Renderizado via script -->
+        </div>
       </div>
     </section>
 
@@ -107,9 +111,7 @@
       <form id="formQuestoes" class="space-y-4">
         <div id="listaQuestoesContainer" class="space-y-4"></div>
         <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl flex flex-col md:flex-row justify-between items-center gap-3">
-          <button type="button" onclick="cancelarVoltar()" class="text-xs text-slate-400 hover:text-white underline">
-            &larr; Voltar e Liberar Tema
-          </button>
+          <button type="button" onclick="cancelarVoltar()" class="text-xs text-slate-400 hover:text-white underline">&larr; Voltar e Liberar Tema</button>
           <button type="submit" class="w-full md:w-auto bg-emerald-600 hover:bg-emerald-500 text-white font-black px-8 py-3.5 rounded-xl shadow-lg transition text-sm flex items-center justify-center gap-2">
             <span>FINALIZAR AUDITORIA & ENVIAR NOTA</span> &rarr;
           </button>
@@ -144,20 +146,9 @@
           <div id="resGabaritoDetalhado" class="space-y-3 text-xs max-h-[450px] overflow-y-auto pr-2 custom-scrollbar"></div>
         </div>
 
-        <div class="bg-blue-950/40 border border-blue-800/50 p-4 rounded-xl text-xs text-blue-200 no-print space-y-1.5">
-          <strong class="text-white font-bold block mb-1">Roteiro do Pitch para a Sala (5 a 7 minutos):</strong>
-          <p>1. Apresente as características do modal e as principais dificuldades de cálculo/estiva.</p>
-          <p>2. Justifique as decisões tomadas sobre embalagem, amarração e documentação legal (CT-e, MDF-e, AET, etc.).</p>
-          <p>3. Destaque quais foram as questões mais desafiadoras apontadas no laudo acima.</p>
-        </div>
-
         <div class="flex flex-wrap justify-between items-center gap-3 pt-4 border-t border-slate-800 no-print">
-          <button onclick="alternarAba('telaRanking')" class="bg-blue-600 hover:bg-blue-500 text-white font-bold px-5 py-2.5 rounded-lg text-xs transition">
-            Ver Colocação no Ranking &rarr;
-          </button>
-          <button onclick="window.print()" class="bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 font-semibold px-5 py-2.5 rounded-lg text-xs transition flex items-center gap-1.5">
-            <span>🖨️</span> Salvar / Imprimir Laudo em PDF
-          </button>
+          <button onclick="alternarAba('telaRanking')" class="bg-blue-600 hover:bg-blue-500 text-white font-bold px-5 py-2.5 rounded-lg text-xs transition">Ver Colocação no Ranking &rarr;</button>
+          <button onclick="window.print()" class="bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 font-semibold px-5 py-2.5 rounded-lg text-xs transition">Salvar / Imprimir Laudo em PDF</button>
         </div>
       </div>
     </section>
@@ -166,14 +157,10 @@
     <section id="telaRanking" class="hidden space-y-6">
       <div class="flex flex-wrap justify-between items-center gap-3">
         <div>
-          <h2 class="text-2xl font-black text-white flex items-center gap-2">
-            <span>🏆</span> PLACAR DE AUDITORIA // CLASSIFICAÇÃO
-          </h2>
-          <p class="text-xs text-slate-400">Critério de ordenação: 1º Maior Nota (0 a 10) &bull; 2º Ordem de Entrega (Horário)</p>
+          <h2 class="text-2xl font-black text-white flex items-center gap-2"><span>🏆</span> PLACAR DE AUDITORIA // CLASSIFICAÇÃO</h2>
+          <p class="text-xs text-slate-400">1º Maior Nota (0 a 10) &bull; 2º Ordem de Entrega</p>
         </div>
-        <button onclick="alternarAba('telaSelecao')" class="text-xs text-slate-400 hover:text-white underline">
-          &larr; Voltar para a Seleção de Temas
-        </button>
+        <button onclick="alternarAba('telaSelecao')" class="text-xs text-slate-400 hover:text-white underline">&larr; Voltar para a Seleção de Temas</button>
       </div>
 
       <div class="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-2xl">
@@ -193,7 +180,7 @@
           </table>
         </div>
         <div id="rankingVazioAviso" class="p-8 text-center text-xs text-slate-500 hidden">
-          Nenhuma dupla finalizou a prova ainda. As notas aparecerão aqui automaticamente conforme os envios forem concluídos.
+          Nenhuma dupla finalizou a prova ainda.
         </div>
       </div>
     </section>
@@ -201,14 +188,11 @@
   </main>
 
   <footer class="text-center py-4 text-xs text-slate-600 border-t border-slate-900 no-print">
-    Simulador de Gestão de Cargas &bull; Desenvolvido para Aulas Práticas de Logística &bull; 2026
+    Simulador de Gestão de Cargas &bull; 2026
   </footer>
 
-  <!-- CARREGA O ARQUIVO EXTERNO COM TODAS AS 350 QUESTÕES -->
-  <script src="questoes.js"></script>
-
-  <!-- CONTROLADOR DO SISTEMA E SINCRONIZAÇÃO -->
   <script>
+    // URL CONECTADA AO SEU FIREBASE
     const FIREBASE_URL = "https://aula-1929a-default-rtdb.firebaseio.com/";
 
     let temaAtivo = null;
@@ -234,7 +218,7 @@
       grid.innerHTML = "";
       let livres = 0;
 
-      BANCO_TEMAS.forEach(tema => {
+      window.BANCO_TEMAS.forEach(tema => {
         const ocupadoPor = ocupados[tema.id];
         if (!ocupadoPor) livres++;
 
@@ -248,9 +232,7 @@
           <div>
             <div class="flex justify-between items-start mb-2">
               <span class="text-[10px] font-mono px-2 py-0.5 rounded-md font-bold ${
-                ocupadoPor 
-                  ? 'bg-rose-950 text-rose-400 border border-rose-800' 
-                  : 'bg-emerald-950 text-emerald-400 border border-emerald-800'
+                ocupadoPor ? 'bg-rose-950 text-rose-400 border border-rose-800' : 'bg-emerald-950 text-emerald-400 border border-emerald-800'
               }">
                 ${ocupadoPor ? 'TEMA BLOQUEADO' : 'DISPONÍVEL'}
               </span>
@@ -262,12 +244,8 @@
           <div>
             ${
               ocupadoPor 
-                ? `<div class="text-[11px] text-rose-400 font-medium bg-rose-950/40 p-2 rounded-lg border border-rose-900/50">
-                    🔒 Reservado para: <strong>${ocupadoPor}</strong>
-                   </div>`
-                : `<button onclick="escolherTema(${tema.id})" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-2.5 rounded-xl text-xs transition shadow-md">
-                    Selecionar e Travar Este Tema &rarr;
-                   </button>`
+                ? `<div class="text-[11px] text-rose-400 font-medium bg-rose-950/40 p-2 rounded-lg border border-rose-900/50">🔒 Reservado para: <strong>${ocupadoPor}</strong></div>`
+                : `<button onclick="escolherTema(${tema.id})" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-2.5 rounded-xl text-xs transition shadow-md">Selecionar e Travar Este Tema &rarr;</button>`
             }
           </div>
         `;
@@ -282,7 +260,7 @@
       const a2 = document.getElementById('campoAluno2').value.trim();
 
       if (!a1 || !a2) {
-        alert("Atenção: É obrigatório informar o nome dos DOIS integrantes da dupla!");
+        alert("Atenção: É obrigatório preencher o nome dos DOIS alunos da dupla!");
         document.getElementById('campoAluno1').focus();
         return;
       }
@@ -291,10 +269,10 @@
       const identificacao = `${a1} & ${a2}`;
 
       try {
-        const checagem = await fetch(`${FIREBASE_URL}/temas_ocupados/${temaId}.json`);
-        const ocupado = await checagem.json();
+        const resChecagem = await fetch(`${FIREBASE_URL}/temas_ocupados/${temaId}.json`);
+        const ocupado = await resChecagem.json();
         if (ocupado) {
-          alert(`O tema acabou de ser travado pela dupla ${ocupado}! Escolha outro cenário.`);
+          alert(`Este tema acabou de ser travado pela dupla: ${ocupado}! Escolha outro cenário.`);
           return;
         }
         await fetch(`${FIREBASE_URL}/temas_ocupados/${temaId}.json`, {
@@ -305,12 +283,12 @@
         console.error("Erro Firebase:", e);
       }
 
-      temaAtivo = BANCO_TEMAS.find(t => t.id === temaId);
+      temaAtivo = window.BANCO_TEMAS.find(t => t.id === temaId);
       carregarQuestionario();
     }
 
     function carregarQuestionario() {
-      document.getElementById('badgeTemaQuestoes').innerText = `Cenário #0${temaAtivo.id} • 35 Questões Técnicas`;
+      document.getElementById('badgeTemaQuestoes').innerText = `Cenário #0${temaAtivo.id} • 35 Questões`;
       document.getElementById('tituloTemaQuestoes').innerText = temaAtivo.nome;
       document.getElementById('subtituloDuplaQuestoes').innerText = `Dupla Operacional: ${dadosDupla.aluno1} e ${dadosDupla.aluno2}`;
 
@@ -319,25 +297,23 @@
 
       temaAtivo.questoes.forEach((q) => {
         const cardQ = document.createElement('div');
-        cardQ.className = "bg-slate-900 border border-slate-800 p-5 rounded-2xl space-y-3 transition";
+        cardQ.className = "bg-slate-900 border border-slate-800 p-5 rounded-2xl space-y-3";
         cardQ.id = `bloco_questao_${q.id}`;
 
-        const optionsHtml = ['A', 'B', 'C', 'D'].map(letra => {
-          return `<label class="flex items-start gap-2.5 p-2.5 bg-slate-950 rounded-xl border border-slate-800 hover:border-slate-700 cursor-pointer transition">
-            <input type="radio" name="resp_${q.id}" value="${letra}" onchange="atualizarProgresso()" class="mt-0.5 text-blue-600 focus:ring-0">
+        const optionsHtml = ['A', 'B', 'C', 'D'].map(letra => `
+          <label class="flex items-start gap-2.5 p-2.5 bg-slate-950 rounded-xl border border-slate-800 hover:border-slate-700 cursor-pointer transition">
+            <input type="radio" name="resp_${q.id}" value="${letra}" onchange="atualizarProgresso()" class="mt-0.5 text-blue-600">
             <span class="text-slate-300"><strong class="text-white font-mono">(${letra})</strong> ${q.opcoes[letra]}</span>
-          </label>`;
-        }).join('');
+          </label>
+        `).join('');
 
         cardQ.innerHTML = `
           <div class="flex justify-between items-center border-b border-slate-800 pb-2">
             <span class="text-xs font-mono font-bold text-blue-400">QUESTÃO ${String(q.id).padStart(2, '0')} / 35</span>
-            <span class="text-[11px] font-mono text-slate-500 uppercase">Peso: ~0,285 pts</span>
+            <span class="text-[11px] font-mono text-slate-500 uppercase">~0,285 pts</span>
           </div>
           <p class="text-sm font-semibold text-slate-100 leading-snug">${q.enunciado}</p>
-          <div class="space-y-2 pt-1 text-xs">
-            ${optionsHtml}
-          </div>
+          <div class="space-y-2 pt-1 text-xs">${optionsHtml}</div>
         `;
         container.appendChild(cardQ);
       });
@@ -350,17 +326,14 @@
       if (!temaAtivo) return;
       let preenchidas = 0;
       temaAtivo.questoes.forEach(q => {
-        if (document.querySelector(`input[name="resp_${q.id}"]:checked`)) {
-          preenchidas++;
-        }
+        if (document.querySelector(`input[name="resp_${q.id}"]:checked`)) preenchidas++;
       });
       document.getElementById('contadorRespondidas').innerText = `${preenchidas} / 35`;
-      const perc = (preenchidas / 35) * 100;
-      document.getElementById('barraProgresso').style.width = `${perc}%`;
+      document.getElementById('barraProgresso').style.width = `${(preenchidas / 35) * 100}%`;
     }
 
     function cancelarVoltar() {
-      if (confirm("Deseja realmente voltar? O tema será desocupado.")) {
+      if (confirm("Deseja realmente voltar? O tema será desocupado no Firebase.")) {
         fetch(`${FIREBASE_URL}/temas_ocupados/${temaAtivo.id}.json`, { method: 'DELETE' });
         temaAtivo = null;
         alternarAba('telaSelecao');
@@ -372,16 +345,12 @@
 
       let faltantes = [];
       temaAtivo.questoes.forEach(q => {
-        if (!document.querySelector(`input[name="resp_${q.id}"]:checked`)) {
-          faltantes.push(q.id);
-        }
+        if (!document.querySelector(`input[name="resp_${q.id}"]:checked`)) faltantes.push(q.id);
       });
 
       if (faltantes.length > 0) {
-        alert(`Atenção: Existem ${faltantes.length} questões sem resposta! Por favor responda todas antes de enviar.`);
-        const prim = document.getElementById(`bloco_questao_${faltantes[0]}`);
-        prim.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        prim.classList.add('border-amber-500');
+        alert(`Atenção: Existem ${faltantes.length} questões sem resposta!`);
+        document.getElementById(`bloco_questao_${faltantes[0]}`).scrollIntoView({ behavior: 'smooth', block: 'center' });
         return;
       }
 
@@ -399,8 +368,7 @@
           marcada: marcada,
           correta: q.correta,
           acertou: correto,
-          explicacao: q.explicacao,
-          textoCorreto: q.opcoes[q.correta]
+          explicacao: q.explicacao
         });
       });
 
@@ -410,7 +378,6 @@
       const registro = {
         dupla: `${dadosDupla.aluno1} e ${dadosDupla.aluno2}`,
         tema: temaAtivo.nome,
-        temaId: temaAtivo.id,
         acertos: acertos,
         nota: parseFloat(notaDecimal),
         hora: agoraStr,
@@ -438,14 +405,11 @@
       diagContainer.innerHTML = "";
       diagnostico.forEach(d => {
         const div = document.createElement('div');
-        div.className = "p-3 rounded-xl border " + (d.acertou 
-          ? "bg-emerald-950/20 border-emerald-800/50 text-emerald-200" 
-          : "bg-rose-950/20 border-rose-800/50 text-rose-200");
-
+        div.className = "p-3 rounded-xl border " + (d.acertou ? "bg-emerald-950/20 border-emerald-800/50 text-emerald-200" : "bg-rose-950/20 border-rose-800/50 text-rose-200");
         div.innerHTML = `
           <div class="flex justify-between items-center mb-1">
             <span class="font-mono font-bold">Questão ${d.numero}: ${d.acertou ? '✔️ ACERTOU' : '❌ ERROU'}</span>
-            <span class="font-mono text-[10px]">Marcou (${d.marcada}) &bull; Correta: (${d.correta})</span>
+            <span class="font-mono text-[10px]">Marcou (${d.marcada}) • Correta: (${d.correta})</span>
           </div>
           <p class="text-[11px] text-slate-300 mb-1">${d.enunciado}</p>
           <p class="text-[11px] italic text-slate-400 font-sans">💡 Fundamento: ${d.explicacao}</p>
@@ -453,7 +417,7 @@
         diagContainer.appendChild(div);
       });
 
-      alert(`Auditoria Concluída com Sucesso!\nDupla: ${registro.dupla}\nNota: ${notaDecimal} / 10.0\nSeu resultado já foi registrado no Ranking Geral!`);
+      alert(`Auditoria Finalizada com Sucesso!\nNota: ${notaDecimal} / 10.0\nEnviada ao Ranking!`);
       alternarAba('telaResultado');
     });
 
@@ -493,27 +457,17 @@
       aviso.classList.add('hidden');
 
       const ordenados = lista.sort((a, b) => b.nota - a.nota || a.timestamp - b.timestamp);
-
       corpo.innerHTML = "";
       ordenados.forEach((item, index) => {
         const tr = document.createElement('tr');
-        tr.className = index === 0 
-          ? "bg-amber-500/10 font-semibold" 
-          : "hover:bg-slate-800/40 transition";
-
+        tr.className = index === 0 ? "bg-amber-500/10 font-semibold" : "hover:bg-slate-800/40 transition";
         tr.innerHTML = `
-          <td class="py-3 px-4 font-mono font-bold">
-            ${index === 0 ? '🥇 1º' : index === 1 ? '🥈 2º' : index === 2 ? '🥉 3º' : `${index + 1}º`}
-          </td>
+          <td class="py-3 px-4 font-mono font-bold">${index === 0 ? '🥇 1º' : index === 1 ? '🥈 2º' : index === 2 ? '🥉 3º' : `${index + 1}º`}</td>
           <td class="py-3 px-4 text-white font-medium">${item.dupla}</td>
           <td class="py-3 px-4 text-slate-300 text-xs">${item.tema}</td>
           <td class="py-3 px-4 font-mono text-xs text-slate-400">${item.hora}</td>
           <td class="py-3 px-4 text-center font-mono text-xs text-slate-300">${item.acertos} / 35</td>
-          <td class="py-3 px-4 text-right font-mono font-black text-base ${
-            item.nota >= 7.0 ? 'text-emerald-400' : 'text-amber-400'
-          }">
-            ${item.nota.toFixed(1)}
-          </td>
+          <td class="py-3 px-4 text-right font-mono font-black text-base ${item.nota >= 7.0 ? 'text-emerald-400' : 'text-amber-400'}">${item.nota.toFixed(1)}</td>
         `;
         corpo.appendChild(tr);
       });

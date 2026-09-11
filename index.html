@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Desafio Logístico TMS // Gestão de Cargas</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Carrega as 350 questões -->
+  <!-- Carrega o banco de 350 questões -->
   <script src="questoes.js"></script>
   <style>
     @media print {
@@ -54,30 +54,26 @@
           <h3 class="text-lg font-bold text-white flex items-center gap-2">
             <span>🛡️</span> Painel de Controle Docente
           </h3>
-          <p class="text-xs text-slate-400">Gerenciamento direto do banco de dados em tempo real</p>
+          <p class="text-xs text-slate-400">Gerenciamento direto da base de dados em tempo real</p>
         </div>
         <button onclick="fecharModalAdmin()" class="text-slate-400 hover:text-white font-bold text-lg">&times;</button>
       </div>
 
-      <!-- Gerenciamento de Temas -->
       <div class="space-y-3">
         <div class="flex justify-between items-center">
-          <h4 class="text-xs font-bold uppercase tracking-wider text-slate-300">Status Atual dos 10 Temas</h4>
+          <h4 class="text-xs font-bold uppercase tracking-wider text-slate-300">Status dos 10 Temas</h4>
           <button onclick="liberarTodosOsTemas()" class="text-[11px] bg-rose-950 hover:bg-rose-900 text-rose-300 border border-rose-800 px-2.5 py-1 rounded transition">
             Liberar TODOS os Temas
           </button>
         </div>
 
-        <div id="listaTemasAdmin" class="max-h-60 overflow-y-auto space-y-2 pr-1 custom-scrollbar text-xs">
-          <!-- Injetado dinamicamente -->
-        </div>
+        <div id="listaTemasAdmin" class="max-h-60 overflow-y-auto space-y-2 pr-1 custom-scrollbar text-xs"></div>
       </div>
 
-      <!-- Gerenciamento do Ranking -->
       <div class="pt-3 border-t border-slate-800 flex justify-between items-center">
         <div>
           <span class="text-xs font-semibold text-slate-300 block">Zerar Placar / Ranking</span>
-          <span class="text-[11px] text-slate-500">Exclui todas as notas e histórico de testes</span>
+          <span class="text-[11px] text-slate-500">Exclui todas as notas e envios de teste</span>
         </div>
         <button onclick="zerarPlacarRanking()" class="text-xs bg-amber-950 hover:bg-amber-900 text-amber-300 border border-amber-800 px-3 py-1.5 rounded-lg transition font-semibold">
           Zerar Ranking
@@ -93,7 +89,7 @@
   <!-- CONTEÚDO PRINCIPAL -->
   <main class="flex-grow max-w-6xl w-full mx-auto p-4 md:p-6 space-y-6">
 
-    <!-- BANNER DE STATUS E AVISO DE SESSÃO RECUPERADA -->
+    <!-- BANNER DE SESSÃO / CONEXÃO -->
     <div class="no-print space-y-2">
       <div class="bg-slate-900/80 border border-slate-800 px-4 py-2.5 rounded-xl flex items-center justify-between text-xs">
         <div class="flex items-center gap-2">
@@ -182,6 +178,23 @@
     <!-- TELA 3: RELATÓRIO INDIVIDUAL -->
     <section id="telaResultado" class="hidden space-y-6">
       <div id="areaRelatorioImpressao" class="bg-slate-900 border border-slate-800 p-6 md:p-8 rounded-2xl space-y-6">
+        
+        <!-- MENSAGEM DO PROFESSOR (INCENTIVO E REFLEXÃO) -->
+        <div class="bg-gradient-to-br from-blue-950/70 via-slate-900 to-slate-900 border border-blue-800/60 p-5 md:p-6 rounded-2xl relative overflow-hidden shadow-md">
+          <div class="absolute -right-6 -bottom-6 text-8xl text-blue-600/10 font-serif select-none pointer-events-none">”</div>
+          <div class="flex items-center gap-2 text-amber-400 text-xs font-bold uppercase tracking-wider mb-2">
+            <span>⭐</span> Palavra do Professor à Dupla
+          </div>
+          <h4 class="text-white text-base md:text-lg font-bold mb-2">Parabéns pelo empenho e dedicação operacional!</h4>
+          <p class="text-xs md:text-sm text-slate-300 leading-relaxed italic mb-4">
+            "A gestão de cargas vai muito além do transporte de volumes de um ponto a outro; ela é a engrenagem que move a economia, exige respeito irrestrito à vida, às normas viárias e à integridade de cada processo. Cada decisão tomada neste desafio simula a responsabilidade real que estará nas mãos de vocês no mercado. Confiem na capacidade analítica de vocês, aprendam com cada ponto deste laudo e defendam o seu planejamento com firmeza técnica!"
+          </p>
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1 pt-3 border-t border-blue-800/40 text-xs">
+            <span class="text-blue-300 font-semibold font-mono">Prof. Stepherson Licetti Fontoura</span>
+            <span class="text-slate-400 text-[11px]">Especialista em Trânsito, Direito e Educação | Consultor Logístico</span>
+          </div>
+        </div>
+
         <div class="border-b border-slate-800 pb-4 flex flex-col md:flex-row justify-between items-start md:items-end gap-3">
           <div>
             <span class="text-xs font-mono text-blue-400 uppercase tracking-wider">Certificado de Avaliação Operacional</span>
@@ -247,13 +260,18 @@
 
   </main>
 
-  <footer class="text-center py-4 text-xs text-slate-600 border-t border-slate-900 no-print">
-    Simulador de Gestão de Cargas &bull; 2026
+  <!-- RODAPÉ INSTITUCIONAL PERSONALIZADO -->
+  <footer class="text-center py-6 px-4 text-xs text-slate-500 border-t border-slate-900 no-print space-y-1.5 bg-slate-950">
+    <p class="text-slate-400">
+      Simulador de Gestão de Cargas &bull; Desenvolvido com dedicação pedagógica pelo <strong>Prof. Stepherson Fontoura</strong>
+    </p>
+    <p class="text-[11px] text-slate-600">
+      Especialista em Trânsito, Direito e Educação &bull; Projetado para Aulas Práticas de Logística (2026)
+    </p>
   </footer>
 
   <script>
     const FIREBASE_URL = "https://aula-1929a-default-rtdb.firebaseio.com/";
-    // SENHA DO PROFESSOR (Altere aqui se desejar outra senha)
     const SENHA_ADMIN = "senai2026";
 
     let temaAtivo = null;
@@ -275,9 +293,7 @@
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
-    // ==========================================
-    // FUNÇÕES DO PAINEL DOCENTE / ADMIN
-    // ==========================================
+    // GESTÃO DOCENTE / ADMIN
     function solicitarAcessoAdmin() {
       const senha = prompt("Acesso Restrito ao Professor.\nDigite a senha mestra:");
       if (senha === SENHA_ADMIN) {
@@ -350,9 +366,7 @@
       }
     }
 
-    // ==========================================
-    // PERSISTÊNCIA E RECUPERAÇÃO DE SESSÃO
-    // ==========================================
+    // PERSISTÊNCIA E SESSÃO
     function checarSessaoEmAndamento() {
       const sessaoRaw = localStorage.getItem('tms_sessao_ativa');
       if (!sessaoRaw) return;

@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Desafio Logístico TMS // Gestão de Cargas</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Carrega as 350 questões do arquivo externo -->
+  <!-- Carrega as 350 questões -->
   <script src="questoes.js"></script>
   <style>
     @media print {
@@ -45,12 +45,26 @@
   <!-- CONTEÚDO PRINCIPAL -->
   <main class="flex-grow max-w-6xl w-full mx-auto p-4 md:p-6 space-y-6">
 
-    <div class="no-print bg-slate-900/80 border border-slate-800 px-4 py-2.5 rounded-xl flex items-center justify-between text-xs">
-      <div class="flex items-center gap-2">
-        <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
-        <span class="text-slate-300">Modo de Operação: <strong>Sincronização em Tempo Real Ativa (Firebase)</strong></span>
+    <!-- BANNER DE STATUS E AVISO DE SESSÃO RECUPERADA -->
+    <div class="no-print space-y-2">
+      <div class="bg-slate-900/80 border border-slate-800 px-4 py-2.5 rounded-xl flex items-center justify-between text-xs">
+        <div class="flex items-center gap-2">
+          <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+          <span class="text-slate-300">Sincronização Ativa: <strong>Firebase Realtime Database</strong></span>
+        </div>
+        <span class="text-slate-500 font-mono text-[11px]">Salvamento Automático Ativo</span>
       </div>
-      <span class="text-slate-500 font-mono text-[11px]">35 Questões/Tema &bull; Escala 0 a 10 &bull; 10 Duplas</span>
+
+      <div id="bannerSessaoRecuperada" class="hidden bg-blue-950/60 border border-blue-800/80 p-3 rounded-xl flex items-center justify-between text-xs">
+        <div class="flex items-center gap-2 text-blue-200">
+          <span>🔄</span>
+          <span>Sessão em andamento detectada para: <strong id="txtSessaoDupla" class="text-white"></strong> (<span id="txtSessaoTema" class="text-blue-300"></span>)</span>
+        </div>
+        <div class="flex gap-2">
+          <button onclick="retomarSessaoSalva()" class="bg-blue-600 hover:bg-blue-500 text-white font-bold px-3 py-1 rounded text-xs">Continuar Prova</button>
+          <button onclick="descartarSessaoSalva()" class="text-slate-400 hover:text-rose-400 text-xs underline">Descartar</button>
+        </div>
+      </div>
     </div>
 
     <!-- TELA 1: CADASTRO E SELEÇÃO DE TEMA -->
@@ -60,16 +74,16 @@
           <span class="w-7 h-7 rounded-lg bg-blue-600/20 text-blue-400 border border-blue-500/30 flex items-center justify-center font-bold text-xs">1</span>
           <h2 class="text-base md:text-lg font-bold text-white">Identificação da Dupla de Operadores</h2>
         </div>
-        <p class="text-xs text-slate-400 mb-4">Insira o nome completo dos dois integrantes da dupla. Em seguida, escolham um dos temas livres. Ao confirmar, o tema fica bloqueado para as outras duplas.</p>
+        <p class="text-xs text-slate-400 mb-4">Insira o nome completo dos dois integrantes da dupla. Em seguida, escolham um dos temas livres.</p>
         
         <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
           <div>
             <label class="block text-xs font-semibold text-slate-400 mb-1">Aluno 1:</label>
-            <input type="text" id="campoAluno1" placeholder="Ex.: Lucas Alves" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2.5 text-sm text-white focus:border-blue-500 outline-none">
+            <input type="text" id="campoAluno1" oninput="atualizarEstadoBotoes()" placeholder="Ex.: Lucas Alves" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2.5 text-sm text-white focus:border-blue-500 outline-none">
           </div>
           <div>
             <label class="block text-xs font-semibold text-slate-400 mb-1">Aluno 2:</label>
-            <input type="text" id="campoAluno2" placeholder="Ex.: Mariana Fontes" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2.5 text-sm text-white focus:border-blue-500 outline-none">
+            <input type="text" id="campoAluno2" oninput="atualizarEstadoBotoes()" placeholder="Ex.: Mariana Fontes" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2.5 text-sm text-white focus:border-blue-500 outline-none">
           </div>
         </div>
       </div>
@@ -83,9 +97,7 @@
           <span id="contadorLivres" class="text-xs font-mono bg-slate-800 text-slate-300 px-2.5 py-1 rounded-full border border-slate-700">10 temas disponíveis</span>
         </div>
 
-        <div id="gridTemas" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          <!-- Renderizado via script -->
-        </div>
+        <div id="gridTemas" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
       </div>
     </section>
 
@@ -111,7 +123,7 @@
       <form id="formQuestoes" class="space-y-4">
         <div id="listaQuestoesContainer" class="space-y-4"></div>
         <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl flex flex-col md:flex-row justify-between items-center gap-3">
-          <button type="button" onclick="cancelarVoltar()" class="text-xs text-slate-400 hover:text-white underline">&larr; Voltar e Liberar Tema</button>
+          <button type="button" onclick="cancelarVoltar()" class="text-xs text-slate-400 hover:text-white underline">&larr; Desistir e Liberar Tema</button>
           <button type="submit" class="w-full md:w-auto bg-emerald-600 hover:bg-emerald-500 text-white font-black px-8 py-3.5 rounded-xl shadow-lg transition text-sm flex items-center justify-center gap-2">
             <span>FINALIZAR AUDITORIA & ENVIAR NOTA</span> &rarr;
           </button>
@@ -192,7 +204,6 @@
   </footer>
 
   <script>
-    // URL CONECTADA AO SEU FIREBASE
     const FIREBASE_URL = "https://aula-1929a-default-rtdb.firebaseio.com/";
 
     let temaAtivo = null;
@@ -200,6 +211,7 @@
     let temasOcupadosCache = {};
 
     window.addEventListener('DOMContentLoaded', () => {
+      checarSessaoEmAndamento();
       renderizarPainelTemas();
       sincronizarTemasEmTempoReal();
       sincronizarRankingEmTempoReal();
@@ -213,18 +225,71 @@
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
+    // Identifica se havia uma sessão ativa gravada no aparelho
+    function checarSessaoEmAndamento() {
+      const sessaoRaw = localStorage.getItem('tms_sessao_ativa');
+      if (!sessaoRaw) return;
+
+      try {
+        const sessao = JSON.parse(sessaoRaw);
+        if (sessao && sessao.temaId && sessao.aluno1) {
+          dadosDupla = { aluno1: sessao.aluno1, aluno2: sessao.aluno2 };
+          document.getElementById('campoAluno1').value = sessao.aluno1;
+          document.getElementById('campoAluno2').value = sessao.aluno2;
+
+          const tema = window.BANCO_TEMAS.find(t => t.id === sessao.temaId);
+          if (tema) {
+            document.getElementById('txtSessaoDupla').innerText = `${sessao.aluno1} & ${sessao.aluno2}`;
+            document.getElementById('txtSessaoTema').innerText = tema.nome;
+            document.getElementById('bannerSessaoRecuperada').classList.remove('hidden');
+          }
+        }
+      } catch (e) {
+        localStorage.removeItem('tms_sessao_ativa');
+      }
+    }
+
+    function retomarSessaoSalva() {
+      const sessao = JSON.parse(localStorage.getItem('tms_sessao_ativa'));
+      temaAtivo = window.BANCO_TEMAS.find(t => t.id === sessao.temaId);
+      carregarQuestionario();
+    }
+
+    function descartarSessaoSalva() {
+      if (confirm("Deseja descartar a sessão em andamento? As respostas salvas serão apagadas.")) {
+        const sessao = JSON.parse(localStorage.getItem('tms_sessao_ativa'));
+        if (sessao && sessao.temaId) {
+          fetch(`${FIREBASE_URL}/temas_ocupados/${sessao.temaId}.json`, { method: 'DELETE' });
+        }
+        localStorage.removeItem('tms_sessao_ativa');
+        document.getElementById('bannerSessaoRecuperada').classList.add('hidden');
+        renderizarPainelTemas();
+      }
+    }
+
+    function atualizarEstadoBotoes() {
+      renderizarPainelTemas();
+    }
+
     function renderizarPainelTemas(ocupados = temasOcupadosCache) {
       const grid = document.getElementById('gridTemas');
       grid.innerHTML = "";
       let livres = 0;
 
+      const a1Atual = document.getElementById('campoAluno1').value.trim().toLowerCase();
+      const a2Atual = document.getElementById('campoAluno2').value.trim().toLowerCase();
+      const minhaIdentificacao = (a1Atual && a2Atual) ? `${a1Atual} & ${a2Atual}` : "";
+
       window.BANCO_TEMAS.forEach(tema => {
         const ocupadoPor = ocupados[tema.id];
         if (!ocupadoPor) livres++;
 
+        // Checa se os nomes digitados batem com os nomes que travaram o tema
+        const souDono = ocupadoPor && minhaIdentificacao && (ocupadoPor.toLowerCase() === minhaIdentificacao);
+
         const card = document.createElement('div');
         card.className = "p-5 rounded-2xl border transition flex flex-col justify-between " + 
-          (ocupadoPor 
+          (ocupadoPor && !souDono
             ? "bg-slate-900/40 border-slate-800/80 opacity-60 cursor-not-allowed" 
             : "bg-slate-900 border-slate-800 hover:border-blue-500 shadow-sm");
 
@@ -232,9 +297,11 @@
           <div>
             <div class="flex justify-between items-start mb-2">
               <span class="text-[10px] font-mono px-2 py-0.5 rounded-md font-bold ${
-                ocupadoPor ? 'bg-rose-950 text-rose-400 border border-rose-800' : 'bg-emerald-950 text-emerald-400 border border-emerald-800'
+                souDono 
+                  ? 'bg-blue-950 text-blue-400 border border-blue-800' 
+                  : (ocupadoPor ? 'bg-rose-950 text-rose-400 border border-rose-800' : 'bg-emerald-950 text-emerald-400 border border-emerald-800')
               }">
-                ${ocupadoPor ? 'TEMA BLOQUEADO' : 'DISPONÍVEL'}
+                ${souDono ? 'SEU TEMA RESERVADO' : (ocupadoPor ? 'TEMA BLOQUEADO' : 'DISPONÍVEL')}
               </span>
               <span class="text-xs text-slate-500 font-mono">#0${tema.id}</span>
             </div>
@@ -243,9 +310,15 @@
           </div>
           <div>
             ${
-              ocupadoPor 
-                ? `<div class="text-[11px] text-rose-400 font-medium bg-rose-950/40 p-2 rounded-lg border border-rose-900/50">🔒 Reservado para: <strong>${ocupadoPor}</strong></div>`
-                : `<button onclick="escolherTema(${tema.id})" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-2.5 rounded-xl text-xs transition shadow-md">Selecionar e Travar Este Tema &rarr;</button>`
+              souDono
+                ? `<button onclick="escolherTema(${tema.id})" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2.5 rounded-xl text-xs transition shadow-md flex items-center justify-center gap-1.5">
+                    <span>🔄</span> Retomar Sua Prova &rarr;
+                   </button>`
+                : (ocupadoPor 
+                    ? `<div class="text-[11px] text-rose-400 font-medium bg-rose-950/40 p-2 rounded-lg border border-rose-900/50">🔒 Reservado para: <strong>${ocupadoPor}</strong></div>`
+                    : `<button onclick="escolherTema(${tema.id})" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-2.5 rounded-xl text-xs transition shadow-md">
+                        Selecionar e Travar Este Tema &rarr;
+                       </button>`)
             }
           </div>
         `;
@@ -260,7 +333,7 @@
       const a2 = document.getElementById('campoAluno2').value.trim();
 
       if (!a1 || !a2) {
-        alert("Atenção: É obrigatório preencher o nome dos DOIS alunos da dupla!");
+        alert("Atenção: É obrigatório informar o nome dos DOIS integrantes da dupla!");
         document.getElementById('campoAluno1').focus();
         return;
       }
@@ -271,20 +344,61 @@
       try {
         const resChecagem = await fetch(`${FIREBASE_URL}/temas_ocupados/${temaId}.json`);
         const ocupado = await resChecagem.json();
-        if (ocupado) {
+        
+        // Se estiver ocupado por outra pessoa, bloqueia
+        if (ocupado && ocupado.toLowerCase() !== identificacao.toLowerCase()) {
           alert(`Este tema acabou de ser travado pela dupla: ${ocupado}! Escolha outro cenário.`);
           return;
         }
+
+        // Grava no Firebase
         await fetch(`${FIREBASE_URL}/temas_ocupados/${temaId}.json`, {
           method: 'PUT',
           body: JSON.stringify(identificacao)
         });
+
+        // Salva a sessão no LocalStorage para imunidade contra F5
+        salvarSessaoLocal(temaId);
+
       } catch (e) {
         console.error("Erro Firebase:", e);
       }
 
       temaAtivo = window.BANCO_TEMAS.find(t => t.id === temaId);
       carregarQuestionario();
+    }
+
+    function salvarSessaoLocal(temaId) {
+      const sessao = {
+        aluno1: dadosDupla.aluno1,
+        aluno2: dadosDupla.aluno2,
+        temaId: temaId,
+        respostas: recuperarRespostasSalvas()
+      };
+      localStorage.setItem('tms_sessao_ativa', JSON.stringify(sessao));
+    }
+
+    function recuperarRespostasSalvas() {
+      const sessaoRaw = localStorage.getItem('tms_sessao_ativa');
+      if (!sessaoRaw) return {};
+      try {
+        const s = JSON.parse(sessaoRaw);
+        return s.respostas || {};
+      } catch (e) {
+        return {};
+      }
+    }
+
+    function salvarRespostaIndividual(qId, letra) {
+      const respostas = recuperarRespostasSalvas();
+      respostas[qId] = letra;
+      const sessaoRaw = localStorage.getItem('tms_sessao_ativa');
+      if (sessaoRaw) {
+        const s = JSON.parse(sessaoRaw);
+        s.respostas = respostas;
+        localStorage.setItem('tms_sessao_ativa', JSON.stringify(s));
+      }
+      atualizarProgresso();
     }
 
     function carregarQuestionario() {
@@ -295,17 +409,22 @@
       const container = document.getElementById('listaQuestoesContainer');
       container.innerHTML = "";
 
+      const respostasPrevia = recuperarRespostasSalvas();
+
       temaAtivo.questoes.forEach((q) => {
         const cardQ = document.createElement('div');
         cardQ.className = "bg-slate-900 border border-slate-800 p-5 rounded-2xl space-y-3";
         cardQ.id = `bloco_questao_${q.id}`;
 
-        const optionsHtml = ['A', 'B', 'C', 'D'].map(letra => `
-          <label class="flex items-start gap-2.5 p-2.5 bg-slate-950 rounded-xl border border-slate-800 hover:border-slate-700 cursor-pointer transition">
-            <input type="radio" name="resp_${q.id}" value="${letra}" onchange="atualizarProgresso()" class="mt-0.5 text-blue-600">
-            <span class="text-slate-300"><strong class="text-white font-mono">(${letra})</strong> ${q.opcoes[letra]}</span>
-          </label>
-        `).join('');
+        const optionsHtml = ['A', 'B', 'C', 'D'].map(letra => {
+          const checked = respostasPrevia[q.id] === letra ? "checked" : "";
+          return `
+            <label class="flex items-start gap-2.5 p-2.5 bg-slate-950 rounded-xl border border-slate-800 hover:border-slate-700 cursor-pointer transition">
+              <input type="radio" name="resp_${q.id}" value="${letra}" ${checked} onchange="salvarRespostaIndividual(${q.id}, '${letra}')" class="mt-0.5 text-blue-600">
+              <span class="text-slate-300"><strong class="text-white font-mono">(${letra})</strong> ${q.opcoes[letra]}</span>
+            </label>
+          `;
+        }).join('');
 
         cardQ.innerHTML = `
           <div class="flex justify-between items-center border-b border-slate-800 pb-2">
@@ -333,8 +452,10 @@
     }
 
     function cancelarVoltar() {
-      if (confirm("Deseja realmente voltar? O tema será desocupado no Firebase.")) {
+      if (confirm("Deseja realmente desistir desta tentativa? O tema será desocupado no Firebase e suas respostas locais apagadas.")) {
         fetch(`${FIREBASE_URL}/temas_ocupados/${temaAtivo.id}.json`, { method: 'DELETE' });
+        localStorage.removeItem('tms_sessao_ativa');
+        document.getElementById('bannerSessaoRecuperada').classList.add('hidden');
         temaAtivo = null;
         alternarAba('telaSelecao');
       }
@@ -349,7 +470,7 @@
       });
 
       if (faltantes.length > 0) {
-        alert(`Atenção: Existem ${faltantes.length} questões sem resposta!`);
+        alert(`Atenção: Existem ${faltantes.length} questões sem resposta! Responda todas antes de enviar.`);
         document.getElementById(`bloco_questao_${faltantes[0]}`).scrollIntoView({ behavior: 'smooth', block: 'center' });
         return;
       }
@@ -392,6 +513,10 @@
       } catch(err) {
         console.error(err);
       }
+
+      // Limpa a sessão ativa após a entrega definitiva
+      localStorage.removeItem('tms_sessao_ativa');
+      document.getElementById('bannerSessaoRecuperada').classList.add('hidden');
 
       document.getElementById('resDuplaNome').innerText = registro.dupla;
       document.getElementById('resTemaNome').innerText = registro.tema;

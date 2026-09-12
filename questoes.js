@@ -1,4 +1,4 @@
-// BANCO DE DADOS OFICIAL - 10 TEMAS E 350 QUESTÕES TÉCNICAS
+// BANCO DE DADOS OFICIAL - 15 TEMAS E 525 QUESTÕES TÉCNICAS
 window.BANCO_TEMAS = [
   {
     id: 1,
@@ -44,7 +44,7 @@ window.BANCO_TEMAS = [
   }
 ];
 
-// Gerador automático para preencher os outros 9 temas de forma robusta e ultrarrápida
+// Gerador automático para preencher os outros 14 temas de forma robusta e ultrarrápida
 (function montarTemasRestantes() {
   const temasBase = [
     { id: 2, nome: "Granéis Sólidos e Agronegócio", desc: "Pesagem por eixo, tolerância CONTRAN, Rodotrem (74t), tombador de moega, lonamento e quebra de peso." },
@@ -55,7 +55,13 @@ window.BANCO_TEMAS = [
     { id: 7, nome: "Transporte de Cargas Vivas e Bem-Estar Animal", desc: "GTA obrigatória, piso antiderrapante, ventilação de gaiola, paradas para descanso/água e manejo sem estresse." },
     { id: 8, nome: "Transporte Intermodal e Cabotagem (Contêineres)", desc: "Padrões 20'/40' (TEU), pesagem VGM (SOLAS), travas twistlock, Reach Stacker e taxas de demurrage." },
     { id: 9, nome: "Alto Valor Agregado e Gerenciamento de Riscos (PGR)", desc: "Rastreamento híbrido, isca oculta, trava de 5ª roda, sensor anti-jammer, comboio escoltado e cerca virtual." },
-    { id: 10, nome: "Logística Reversa e Resíduos (PNRS)", desc: "Lei 12.305/2010, MTR (SINIR), tríplice lavagem de agrotóxicos (inpEV), baterias e mitigação da logística do vento." }
+    { id: 10, nome: "Logística Reversa e Resíduos (PNRS)", desc: "Lei 12.305/2010, MTR (SINIR), tríplice lavagem de agrotóxicos (inpEV), baterias e mitigação da logística do vento." },
+    // NOVOS 5 TEMAS:
+    { id: 11, nome: "Transporte Ferroviário e Operações Multimodais", desc: "Vagões Hopper e Gôndola, bitola métrica vs. larga, transbordo rodoferroviário e tração diesel-elétrica." },
+    { id: 12, nome: "Cargas Florestais e Celulose (Silvicultura)", desc: "Madeira em toras de eucalipto, composições Tritrem florestal, fueiros reforçados, catracas automáticas e fardos." },
+    { id: 13, nome: "Transporte Aéreo de Cargas e ULDs", desc: "Paletes aéreos PMC, contêineres AKE (ULD), balanceamento e centro de gravidade em aeronaves de carga e normas IATA." },
+    { id: 14, nome: "Logística Portuária, Cargas de Projetos e Breakbulk", desc: "Cargas soltas não conteinerizadas, bobinas de aço, olhais portuários de içamento e estiva em porões de navios." },
+    { id: 15, nome: "Cargas Frágeis, Vidros e Materiais Sensíveis", desc: "Cavaletes em ângulo de 4° a 8°, mantas emborrachadas, suspensão a ar pneumática integral e sensores de impacto." }
   ];
 
   const perguntasModelo = [

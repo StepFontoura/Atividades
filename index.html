@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Desafio Logístico TMS // Gestão de Cargas</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Carrega o banco de 350 questões -->
+  <!-- Carrega o banco expandido de 525 questões -->
   <script src="questoes.js"></script>
   <style>
     @media print {
@@ -28,7 +28,7 @@
         <span class="w-3 h-3 bg-emerald-500 rounded-full animate-ping"></span>
         <div>
           <h1 class="text-lg md:text-xl font-black tracking-wide text-white uppercase">TMS AUDIT // GESTÃO DE CARGAS</h1>
-          <p class="text-xs text-slate-400">10 Duplas &bull; 10 Cenários Exclusivos &bull; Avaliação Técnica de 35 Questões</p>
+          <p class="text-xs text-slate-400">15 Duplas &bull; 15 Cenários Exclusivos &bull; Avaliação Técnica de 35 Questões</p>
         </div>
       </div>
       <div class="flex items-center gap-2">
@@ -61,7 +61,7 @@
 
       <div class="space-y-3">
         <div class="flex justify-between items-center">
-          <h4 class="text-xs font-bold uppercase tracking-wider text-slate-300">Status dos 10 Temas</h4>
+          <h4 class="text-xs font-bold uppercase tracking-wider text-slate-300">Status dos 15 Temas</h4>
           <button onclick="liberarTodosOsTemas()" class="text-[11px] bg-rose-950 hover:bg-rose-900 text-rose-300 border border-rose-800 px-2.5 py-1 rounded transition">
             Liberar TODOS os Temas
           </button>
@@ -96,7 +96,7 @@
           <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
           <span class="text-slate-300">Sincronização Ativa: <strong>Firebase Realtime Database</strong></span>
         </div>
-        <span class="text-slate-500 font-mono text-[11px]">Salvamento Automático Ativo</span>
+        <span class="text-slate-500 font-mono text-[11px]">15 Cenários &bull; Salvamento Automático Ativo</span>
       </div>
 
       <div id="bannerSessaoRecuperada" class="hidden bg-blue-950/60 border border-blue-800/80 p-3 rounded-xl flex items-center justify-between text-xs">
@@ -118,7 +118,7 @@
           <span class="w-7 h-7 rounded-lg bg-blue-600/20 text-blue-400 border border-blue-500/30 flex items-center justify-center font-bold text-xs">1</span>
           <h2 class="text-base md:text-lg font-bold text-white">Identificação da Dupla de Operadores</h2>
         </div>
-        <p class="text-xs text-slate-400 mb-4">Insira o nome completo dos dois integrantes da dupla. Em seguida, escolham um dos temas livres.</p>
+        <p class="text-xs text-slate-400 mb-4">Insira o nome completo dos dois integrantes da dupla. Em seguida, escolham um dos 15 temas disponíveis.</p>
         
         <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
           <div>
@@ -136,9 +136,9 @@
         <div class="flex justify-between items-center mb-3">
           <div class="flex items-center gap-3">
             <span class="w-7 h-7 rounded-lg bg-blue-600/20 text-blue-400 border border-blue-500/30 flex items-center justify-center font-bold text-xs">2</span>
-            <h2 class="text-base md:text-lg font-bold text-white">Seleção Exclusiva de Cenário Operacional</h2>
+            <h2 class="text-base md:text-lg font-bold text-white">Seleção Exclusiva de Cenário Operacional (15 Temas)</h2>
           </div>
-          <span id="contadorLivres" class="text-xs font-mono bg-slate-800 text-slate-300 px-2.5 py-1 rounded-full border border-slate-700">10 temas disponíveis</span>
+          <span id="contadorLivres" class="text-xs font-mono bg-slate-800 text-slate-300 px-2.5 py-1 rounded-full border border-slate-700">15 temas disponíveis</span>
         </div>
 
         <div id="gridTemas" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
@@ -349,12 +349,12 @@
     }
 
     async function liberarTodosOsTemas() {
-      if (confirm("ATENÇÃO: Deseja desocupar TODOS os 10 temas de uma vez?")) {
+      if (confirm("ATENÇÃO: Deseja desocupar TODOS os 15 temas de uma vez?")) {
         await fetch(`${FIREBASE_URL}/temas_ocupados.json`, { method: 'DELETE' });
         temasOcupadosCache = {};
         atualizarListaAdmin();
         renderizarPainelTemas();
-        alert("Todos os temas foram liberados!");
+        alert("Todos os 15 temas foram liberados!");
       }
     }
 
@@ -443,7 +443,7 @@
               }">
                 ${souDono ? 'SEU TEMA RESERVADO' : (ocupadoPor ? 'TEMA BLOQUEADO' : 'DISPONÍVEL')}
               </span>
-              <span class="text-xs text-slate-500 font-mono">#0${tema.id}</span>
+              <span class="text-xs text-slate-500 font-mono">#${String(tema.id).padStart(2, '0')}</span>
             </div>
             <h3 class="font-bold text-white text-sm md:text-base mb-1">${tema.nome}</h3>
             <p class="text-xs text-slate-400 leading-relaxed mb-4">${tema.desc}</p>
@@ -465,7 +465,7 @@
         grid.appendChild(card);
       });
 
-      document.getElementById('contadorLivres').innerText = `${livres} de 10 disponíveis`;
+      document.getElementById('contadorLivres').innerText = `${livres} de ${window.BANCO_TEMAS.length} disponíveis`;
     }
 
     async function escolherTema(temaId) {
@@ -539,7 +539,7 @@
     }
 
     function carregarQuestionario() {
-      document.getElementById('badgeTemaQuestoes').innerText = `Cenário #0${temaAtivo.id} • 35 Questões`;
+      document.getElementById('badgeTemaQuestoes').innerText = `Cenário #${String(temaAtivo.id).padStart(2, '0')} • 35 Questões`;
       document.getElementById('tituloTemaQuestoes').innerText = temaAtivo.nome;
       document.getElementById('subtituloDuplaQuestoes').innerText = `Dupla Operacional: ${dadosDupla.aluno1} e ${dadosDupla.aluno2}`;
 

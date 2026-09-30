@@ -2,740 +2,811 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Desafio Logístico TMS // Gestão de Cargas</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Relatório de Observação de Atividade - SENAI</title>
+
+  <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Carrega o banco expandido de 525 questões -->
-  <script src="questoes.js"></script>
+  <!-- Font Awesome CDN -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <!-- jsPDF (Native vector PDF engine - 100% reliable on mobile browsers) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            senai: {
+              blue: '#005CA9',
+              dark: '#003366',
+              red: '#E30613',
+              light: '#F4F7FB',
+              border: '#CBD5E1'
+            }
+          },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', '-apple-system', 'Segoe UI', 'Roboto', 'sans-serif'],
+          }
+        }
+      }
+    };
+  </script>
+
   <style>
-    @media print {
-      body * { visibility: hidden; }
-      #areaRelatorioImpressao, #areaRelatorioImpressao * { visibility: visible; }
-      #areaRelatorioImpressao { position: absolute; left: 0; top: 0; width: 100%; }
-      .no-print { display: none !important; }
+    body {
+      -webkit-tap-highlight-color: transparent;
+      background-color: #f8fafc;
     }
-    .custom-scrollbar::-webkit-scrollbar { width: 6px; }
-    .custom-scrollbar::-webkit-scrollbar-track { background: #1e293b; }
-    .custom-scrollbar::-webkit-scrollbar-thumb { background: #3b82f6; border-radius: 3px; }
+    textarea {
+      resize: vertical;
+      min-height: 220px;
+      line-height: 1.6;
+    }
+    .spinner-border {
+      border-top-color: #005CA9;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
   </style>
 </head>
-<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col font-sans selection:bg-blue-600 selection:text-white">
+<body class="font-sans text-slate-800 antialiased min-h-screen flex flex-col justify-between">
 
-  <!-- CABEÇALHO -->
-  <header class="bg-slate-900 border-b border-slate-800 p-4 sticky top-0 z-50 shadow-lg">
-    <div class="max-w-6xl mx-auto flex flex-wrap justify-between items-center gap-3">
-      <div class="flex items-center gap-3">
-        <span class="w-3 h-3 bg-emerald-500 rounded-full animate-ping"></span>
+  <header class="bg-gradient-to-r from-[#003366] to-[#005CA9] text-white shadow-md sticky top-0 z-40">
+    <div class="max-w-3xl mx-auto px-4 py-3 flex items-center justify-between">
+      <div class="flex items-center space-x-3">
+        <div class="bg-white text-[#005CA9] font-black text-xl px-2.5 py-0.5 rounded shadow tracking-tighter">
+          SENAI
+        </div>
         <div>
-          <h1 class="text-lg md:text-xl font-black tracking-wide text-white uppercase">TMS AUDIT // GESTÃO DE CARGAS</h1>
-          <p class="text-xs text-slate-400">15 Duplas &bull; 15 Cenários Exclusivos &bull; Avaliação Técnica de 35 Questões</p>
+          <h1 class="text-[10px] font-semibold tracking-wider uppercase text-blue-200">Educação Profissional</h1>
+          <p class="text-xs sm:text-sm font-bold leading-tight">Observação de Atividade</p>
         </div>
       </div>
-      <div class="flex items-center gap-2">
-        <button onclick="alternarAba('telaSelecao')" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition">
-          Painel de Temas
-        </button>
-        <button onclick="alternarAba('telaRanking')" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-blue-600 hover:bg-blue-500 text-white shadow transition flex items-center gap-1.5">
-          <span>🏆</span> Placar / Ranking
-        </button>
-        <!-- BOTÃO DE ACESSO DO PROFESSOR -->
-        <button onclick="solicitarAcessoAdmin()" class="px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-slate-950 hover:bg-slate-800 text-slate-400 hover:text-amber-300 border border-slate-800 transition flex items-center gap-1">
-          <span>⚙️</span> Docente
-        </button>
+      <div id="save-status" class="text-[11px] text-emerald-300 flex items-center gap-1.5 bg-black/20 px-2.5 py-1 rounded-full border border-white/10">
+        <i class="fa-solid fa-cloud-arrow-up text-xs"></i>
+        <span id="save-text">Rascunho salvo</span>
       </div>
     </div>
   </header>
 
-  <!-- MODAL / PAINEL ADMINISTRATIVO DO PROFESSOR -->
-  <div id="modalAdmin" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-    <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-xl w-full p-6 space-y-5 shadow-2xl">
-      <div class="flex justify-between items-center border-b border-slate-800 pb-3">
-        <div>
-          <h3 class="text-lg font-bold text-white flex items-center gap-2">
-            <span>🛡️</span> Painel de Controle Docente
-          </h3>
-          <p class="text-xs text-slate-400">Gerenciamento direto da base de dados em tempo real</p>
+  <main class="flex-grow max-w-3xl w-full mx-auto p-4 sm:p-6 pb-28">
+    
+    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 mb-5">
+      <div class="border-b border-slate-100 pb-3 mb-4">
+        <div class="flex items-center gap-2">
+          <span class="inline-block text-[11px] font-bold text-senai-blue bg-blue-50 border border-blue-200 px-2.5 py-0.5 rounded-full uppercase tracking-wider">
+            Atividade Avaliativa
+          </span>
+          <span class="text-[11px] text-slate-400 font-medium">Logística Integrada</span>
         </div>
-        <button onclick="fecharModalAdmin()" class="text-slate-400 hover:text-white font-bold text-lg">&times;</button>
+        <h2 class="text-base sm:text-lg font-bold text-senai-dark mt-1">Relatório Reflexivo de Palestra</h2>
+        <p class="text-xs text-slate-500 mt-0.5">Preencha os campos e responda com atenção. O PDF será gerado diretamente com seus dados.</p>
       </div>
 
-      <div class="space-y-3">
-        <div class="flex justify-between items-center">
-          <h4 class="text-xs font-bold uppercase tracking-wider text-slate-300">Status dos 15 Temas</h4>
-          <button onclick="liberarTodosOsTemas()" class="text-[11px] bg-rose-950 hover:bg-rose-900 text-rose-300 border border-rose-800 px-2.5 py-1 rounded transition">
-            Liberar TODOS os Temas
-          </button>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs bg-slate-50 p-3.5 rounded-xl border border-slate-200">
+        <div>
+          <span class="text-slate-500 block font-medium">Docente Responsável:</span>
+          <span class="font-bold text-slate-800 text-sm">Prof. Stepherson Licetti Fontoura</span>
         </div>
-
-        <div id="listaTemasAdmin" class="max-h-60 overflow-y-auto space-y-2 pr-1 custom-scrollbar text-xs"></div>
+        <div>
+          <span class="text-slate-500 block font-medium">Curso:</span>
+          <span class="font-bold text-slate-800 text-sm">Assistente de Logística</span>
+        </div>
+        <div>
+          <span class="text-slate-500 block font-medium">Turno / Período:</span>
+          <span class="font-semibold text-slate-800">Noturno</span>
+        </div>
+        <div>
+          <label for="data-input" class="text-slate-500 block font-medium">Data de Realização:</label>
+          <input type="date" id="data-input" class="bg-white font-semibold text-slate-800 border border-slate-300 rounded px-2 py-0.5 w-full max-w-[170px] focus:outline-none focus:ring-1 focus:ring-senai-blue">
+        </div>
       </div>
 
-      <div class="pt-3 border-t border-slate-800 flex justify-between items-center">
-        <div>
-          <span class="text-xs font-semibold text-slate-300 block">Zerar Placar / Ranking</span>
-          <span class="text-[11px] text-slate-500">Exclui todas as notas e envios de teste</span>
+      <div class="mt-4">
+        <label for="aluno-nome" class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1">
+          Nome Completo do Aluno(a) <span class="text-senai-red">*</span>
+        </label>
+        <div class="relative">
+          <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 pointer-events-none text-slate-400">
+            <i class="fa-solid fa-user-graduate"></i>
+          </span>
+          <input type="text" id="aluno-nome" placeholder="Digite seu nome completo..." 
+                 class="w-full pl-10 pr-3 py-2.5 text-sm bg-white border border-slate-300 rounded-xl focus:outline-none focus:border-senai-blue focus:ring-2 focus:ring-blue-100 transition-all font-medium text-slate-800 shadow-sm">
         </div>
-        <button onclick="zerarPlacarRanking()" class="text-xs bg-amber-950 hover:bg-amber-900 text-amber-300 border border-amber-800 px-3 py-1.5 rounded-lg transition font-semibold">
-          Zerar Ranking
+        <p id="error-nome" class="text-xs text-senai-red mt-1 hidden font-medium">
+          <i class="fa-solid fa-triangle-exclamation mr-1"></i> Por favor, informe seu nome completo antes de gerar o relatório.
+        </p>
+      </div>
+    </div>
+
+    <form id="relatorio-form" class="space-y-5" onsubmit="event.preventDefault();">
+
+      <!-- Pergunta 1 -->
+      <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 transition-shadow hover:shadow-md">
+        <div class="flex items-start gap-3 mb-2.5">
+          <div class="flex items-center justify-center w-7 h-7 rounded-lg bg-blue-100 text-senai-blue font-bold text-sm shrink-0">
+            1
+          </div>
+          <div>
+            <h3 class="font-bold text-sm text-slate-800 leading-snug">Qual é o Tema da palestra?</h3>
+            <span class="text-[11px] text-slate-500">Apresente o título da palestra e os temas centrais abordados.</span>
+          </div>
+        </div>
+        <textarea id="p1" rows="10" placeholder="Escreva detalhadamente a resposta aqui (mínimo de 10 linhas)..."
+                  class="w-full p-3.5 text-sm text-slate-800 border border-slate-300 rounded-xl focus:border-senai-blue focus:ring-2 focus:ring-blue-100 focus:outline-none bg-slate-50/40"></textarea>
+        <div class="flex justify-between items-center text-[11px] text-slate-400 mt-1.5 px-1">
+          <span>Mínimo sugerido: 10 linhas reflexivas</span>
+          <span id="p1-counter">0 caracteres</span>
+        </div>
+      </div>
+
+      <!-- Pergunta 2 -->
+      <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 transition-shadow hover:shadow-md">
+        <div class="flex items-start gap-3 mb-2.5">
+          <div class="flex items-center justify-center w-7 h-7 rounded-lg bg-blue-100 text-senai-blue font-bold text-sm shrink-0">
+            2
+          </div>
+          <div>
+            <h3 class="font-bold text-sm text-slate-800 leading-snug">Qual é o nome da palestrante e sua área de formação?</h3>
+            <span class="text-[11px] text-slate-500">Mencione o palestrante, suas qualificações e trajetória profissional descrita.</span>
+          </div>
+        </div>
+        <textarea id="p2" rows="10" placeholder="Escreva detalhadamente a resposta aqui (mínimo de 10 linhas)..."
+                  class="w-full p-3.5 text-sm text-slate-800 border border-slate-300 rounded-xl focus:border-senai-blue focus:ring-2 focus:ring-blue-100 focus:outline-none bg-slate-50/40"></textarea>
+        <div class="flex justify-between items-center text-[11px] text-slate-400 mt-1.5 px-1">
+          <span>Mínimo sugerido: 10 linhas reflexivas</span>
+          <span id="p2-counter">0 caracteres</span>
+        </div>
+      </div>
+
+      <!-- Pergunta 3 -->
+      <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 transition-shadow hover:shadow-md">
+        <div class="flex items-start gap-3 mb-2.5">
+          <div class="flex items-center justify-center w-7 h-7 rounded-lg bg-blue-100 text-senai-blue font-bold text-sm shrink-0">
+            3
+          </div>
+          <div>
+            <h3 class="font-bold text-sm text-slate-800 leading-snug">Na sua opinião, o que esta palestra trouxe que irá agregar conhecimento para você?</h3>
+            <span class="text-[11px] text-slate-500">Explique os aprendizados que agregaram à sua formação e visão técnica.</span>
+          </div>
+        </div>
+        <textarea id="p3" rows="10" placeholder="Escreva detalhadamente a resposta aqui (mínimo de 10 linhas)..."
+                  class="w-full p-3.5 text-sm text-slate-800 border border-slate-300 rounded-xl focus:border-senai-blue focus:ring-2 focus:ring-blue-100 focus:outline-none bg-slate-50/40"></textarea>
+        <div class="flex justify-between items-center text-[11px] text-slate-400 mt-1.5 px-1">
+          <span>Mínimo sugerido: 10 linhas reflexivas</span>
+          <span id="p3-counter">0 caracteres</span>
+        </div>
+      </div>
+
+      <!-- Pergunta 4 -->
+      <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 transition-shadow hover:shadow-md">
+        <div class="flex items-start gap-3 mb-2.5">
+          <div class="flex items-center justify-center w-7 h-7 rounded-lg bg-blue-100 text-senai-blue font-bold text-sm shrink-0">
+            4
+          </div>
+          <div>
+            <h3 class="font-bold text-sm text-slate-800 leading-snug">Explique como você poderá ajudar outras pessoas, sobre o tema abordado na palestra?</h3>
+            <span class="text-[11px] text-slate-500">Demonstre aplicações práticas no trabalho em equipe, logística e rotina.</span>
+          </div>
+        </div>
+        <textarea id="p4" rows="10" placeholder="Escreva detalhadamente a resposta aqui (mínimo de 10 linhas)..."
+                  class="w-full p-3.5 text-sm text-slate-800 border border-slate-300 rounded-xl focus:border-senai-blue focus:ring-2 focus:ring-blue-100 focus:outline-none bg-slate-50/40"></textarea>
+        <div class="flex justify-between items-center text-[11px] text-slate-400 mt-1.5 px-1">
+          <span>Mínimo sugerido: 10 linhas reflexivas</span>
+          <span id="p4-counter">0 caracteres</span>
+        </div>
+      </div>
+
+      <!-- Pergunta 5 -->
+      <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 transition-shadow hover:shadow-md">
+        <div class="flex items-start gap-3 mb-2.5">
+          <div class="flex items-center justify-center w-7 h-7 rounded-lg bg-blue-100 text-senai-blue font-bold text-sm shrink-0">
+            5
+          </div>
+          <div>
+            <h3 class="font-bold text-sm text-slate-800 leading-snug">Qual ponto da palestra você mais se identificou ou ainda, qual ponto da palestra que você mais gostou?</h3>
+            <span class="text-[11px] text-slate-500">Destaque os momentos de maior impacto pessoal ou profissional.</span>
+          </div>
+        </div>
+        <textarea id="p5" rows="10" placeholder="Escreva detalhadamente a resposta aqui (mínimo de 10 linhas)..."
+                  class="w-full p-3.5 text-sm text-slate-800 border border-slate-300 rounded-xl focus:border-senai-blue focus:ring-2 focus:ring-blue-100 focus:outline-none bg-slate-50/40"></textarea>
+        <div class="flex justify-between items-center text-[11px] text-slate-400 mt-1.5 px-1">
+          <span>Mínimo sugerido: 10 linhas reflexivas</span>
+          <span id="p5-counter">0 caracteres</span>
+        </div>
+      </div>
+
+      <!-- Clear draft button -->
+      <div class="flex justify-end pt-1">
+        <button type="button" id="btn-limpar" class="text-xs text-slate-400 hover:text-senai-red flex items-center gap-1.5 p-2 transition-colors">
+          <i class="fa-regular fa-trash-can"></i> Limpar rascunho
         </button>
       </div>
 
-      <div class="pt-2 text-right">
-        <button onclick="fecharModalAdmin()" class="bg-slate-800 hover:bg-slate-700 text-white text-xs px-4 py-2 rounded-lg transition">Fechar Painel</button>
+    </form>
+  </main>
+
+  <footer class="fixed bottom-0 inset-x-0 bg-white/95 backdrop-blur-md border-t border-slate-200 p-3 sm:p-4 z-40">
+    <div class="max-w-3xl mx-auto flex items-center gap-3">
+      <button type="button" id="btn-preview" class="flex-1 py-3 px-3 rounded-xl border border-slate-300 text-slate-700 bg-slate-50 font-semibold text-xs sm:text-sm flex items-center justify-center gap-2 active:scale-95 transition-all">
+        <i class="fa-solid fa-eye text-senai-blue"></i>
+        <span>Pré-visualizar</span>
+      </button>
+
+      <button type="button" id="btn-gerar" class="flex-[2] py-3 px-4 rounded-xl bg-gradient-to-r from-senai-blue to-senai-dark text-white font-bold text-xs sm:text-sm shadow-md shadow-blue-500/20 flex items-center justify-center gap-2 active:scale-95 transition-all">
+        <i class="fa-solid fa-file-pdf text-lg text-emerald-300"></i>
+        <span>Gerar Relatório (PDF)</span>
+      </button>
+    </div>
+  </footer>
+
+  <!-- Dialog: Loading / Generating -->
+  <div id="modal-loading" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center hidden">
+    <div class="bg-white rounded-2xl p-6 max-w-xs w-full mx-4 text-center shadow-2xl">
+      <div class="spinner-border w-12 h-12 border-4 border-slate-200 rounded-full mx-auto mb-4"></div>
+      <h4 class="font-bold text-slate-800 text-base mb-1" id="loading-title">Gerando PDF Vetorial...</h4>
+      <p class="text-xs text-slate-500">Formatando documento com padrão institucional SENAI.</p>
+    </div>
+  </div>
+
+  <!-- Dialog: Post Generation Action Modal (WhatsApp / Download) -->
+  <div id="modal-success" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-white rounded-3xl p-6 max-w-sm w-full shadow-2xl border border-slate-100 text-center">
+      <div class="w-14 h-14 bg-emerald-100 text-emerald-600 rounded-2xl flex items-center justify-center text-2xl mx-auto mb-3 shadow-inner">
+        <i class="fa-solid fa-circle-check"></i>
+      </div>
+      <h3 class="text-lg font-bold text-slate-900">Relatório Gerado com Sucesso!</h3>
+      <p class="text-xs text-slate-600 mt-1 mb-4">
+        Arquivo preparado com identificação para o grupo do WhatsApp:
+        <span id="success-filename" class="text-senai-blue font-mono font-bold block mt-2 break-all bg-slate-100 p-2 rounded text-[11px] border border-slate-200"></span>
+      </p>
+
+      <div class="space-y-2.5">
+        <!-- Direct Share Button -->
+        <button id="btn-modal-share" class="w-full py-3.5 px-4 bg-[#25D366] hover:bg-[#1ebd5b] text-white font-bold rounded-xl text-sm flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/25 active:scale-95 transition-all">
+          <i class="fa-brands fa-whatsapp text-xl"></i>
+          <span>Enviar para o WhatsApp</span>
+        </button>
+
+        <!-- Direct Download Alternative -->
+        <button id="btn-modal-download" class="w-full py-2.5 px-4 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-xl text-xs flex items-center justify-center gap-2 active:scale-95 transition-all">
+          <i class="fa-solid fa-download"></i>
+          <span>Baixar Arquivo PDF</span>
+        </button>
+
+        <!-- Close Dialog -->
+        <button id="btn-modal-close" class="w-full py-2 text-xs text-slate-400 hover:text-slate-600 font-medium">
+          Voltar ao formulário
+        </button>
       </div>
     </div>
   </div>
 
-  <!-- CONTEÚDO PRINCIPAL -->
-  <main class="flex-grow max-w-6xl w-full mx-auto p-4 md:p-6 space-y-6">
-
-    <!-- BANNER DE SESSÃO / CONEXÃO -->
-    <div class="no-print space-y-2">
-      <div class="bg-slate-900/80 border border-slate-800 px-4 py-2.5 rounded-xl flex items-center justify-between text-xs">
-        <div class="flex items-center gap-2">
-          <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
-          <span class="text-slate-300">Sincronização Ativa: <strong>Firebase Realtime Database</strong></span>
-        </div>
-        <span class="text-slate-500 font-mono text-[11px]">15 Cenários &bull; Salvamento Automático Ativo</span>
-      </div>
-
-      <div id="bannerSessaoRecuperada" class="hidden bg-blue-950/60 border border-blue-800/80 p-3 rounded-xl flex items-center justify-between text-xs">
-        <div class="flex items-center gap-2 text-blue-200">
-          <span>🔄</span>
-          <span>Sessão em andamento detectada para: <strong id="txtSessaoDupla" class="text-white"></strong> (<span id="txtSessaoTema" class="text-blue-300"></span>)</span>
-        </div>
-        <div class="flex gap-2">
-          <button onclick="retomarSessaoSalva()" class="bg-blue-600 hover:bg-blue-500 text-white font-bold px-3 py-1 rounded text-xs">Continuar Prova</button>
-          <button onclick="descartarSessaoSalva()" class="text-slate-400 hover:text-rose-400 text-xs underline">Descartar</button>
-        </div>
+  <!-- Dialog: Preview Modal -->
+  <div id="modal-preview" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex flex-col hidden">
+    <div class="bg-white p-3 border-b flex items-center justify-between">
+      <h4 class="font-bold text-sm text-slate-800 flex items-center gap-2">
+        <i class="fa-solid fa-magnifying-glass text-senai-blue"></i> Pré-visualização do Relatório
+      </h4>
+      <button id="btn-close-preview" class="p-1.5 text-slate-400 hover:text-slate-700 text-lg">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+    <div class="flex-1 overflow-y-auto p-4 flex justify-center bg-slate-200">
+      <div id="preview-content-box" class="bg-white shadow-xl max-w-2xl w-full p-6 text-xs text-slate-800 rounded-lg space-y-4">
+        <!-- Dynamic Preview Populated by JS -->
       </div>
     </div>
-
-    <!-- TELA 1: CADASTRO E SELEÇÃO DE TEMA -->
-    <section id="telaSelecao" class="space-y-6">
-      <div class="bg-slate-900 border border-slate-800 p-5 md:p-6 rounded-2xl shadow-sm">
-        <div class="flex items-center gap-3 mb-2">
-          <span class="w-7 h-7 rounded-lg bg-blue-600/20 text-blue-400 border border-blue-500/30 flex items-center justify-center font-bold text-xs">1</span>
-          <h2 class="text-base md:text-lg font-bold text-white">Identificação da Dupla de Operadores</h2>
-        </div>
-        <p class="text-xs text-slate-400 mb-4">Insira o nome completo dos dois integrantes da dupla. Em seguida, escolham um dos 15 temas disponíveis.</p>
-        
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-          <div>
-            <label class="block text-xs font-semibold text-slate-400 mb-1">Aluno 1:</label>
-            <input type="text" id="campoAluno1" oninput="atualizarEstadoBotoes()" placeholder="Ex.: Lucas Alves" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2.5 text-sm text-white focus:border-blue-500 outline-none">
-          </div>
-          <div>
-            <label class="block text-xs font-semibold text-slate-400 mb-1">Aluno 2:</label>
-            <input type="text" id="campoAluno2" oninput="atualizarEstadoBotoes()" placeholder="Ex.: Mariana Fontes" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2.5 text-sm text-white focus:border-blue-500 outline-none">
-          </div>
-        </div>
-      </div>
-
-      <div>
-        <div class="flex justify-between items-center mb-3">
-          <div class="flex items-center gap-3">
-            <span class="w-7 h-7 rounded-lg bg-blue-600/20 text-blue-400 border border-blue-500/30 flex items-center justify-center font-bold text-xs">2</span>
-            <h2 class="text-base md:text-lg font-bold text-white">Seleção Exclusiva de Cenário Operacional (15 Temas)</h2>
-          </div>
-          <span id="contadorLivres" class="text-xs font-mono bg-slate-800 text-slate-300 px-2.5 py-1 rounded-full border border-slate-700">15 temas disponíveis</span>
-        </div>
-
-        <div id="gridTemas" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
-      </div>
-    </section>
-
-    <!-- TELA 2: QUESTIONÁRIO (35 QUESTÕES) -->
-    <section id="telaQuestoes" class="hidden space-y-6">
-      <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl sticky top-20 z-40 shadow-xl backdrop-blur-md bg-slate-900/95">
-        <div class="flex flex-wrap justify-between items-center gap-3">
-          <div>
-            <span id="badgeTemaQuestoes" class="text-[10px] font-mono uppercase bg-blue-950 text-blue-400 px-2 py-0.5 rounded border border-blue-800">Tema 00</span>
-            <h3 id="tituloTemaQuestoes" class="text-base md:text-lg font-bold text-white mt-1"></h3>
-            <p id="subtituloDuplaQuestoes" class="text-xs text-slate-400"></p>
-          </div>
-          <div class="text-right">
-            <span class="text-xs text-slate-400 block">Progresso da Prova:</span>
-            <span id="contadorRespondidas" class="text-lg font-mono font-black text-emerald-400">0 / 35</span>
-          </div>
-        </div>
-        <div class="w-full bg-slate-800 h-2 rounded-full mt-3 overflow-hidden">
-          <div id="barraProgresso" class="bg-gradient-to-r from-blue-500 to-emerald-500 h-full w-0 transition-all duration-300"></div>
-        </div>
-      </div>
-
-      <form id="formQuestoes" class="space-y-4">
-        <div id="listaQuestoesContainer" class="space-y-4"></div>
-        <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl flex flex-col md:flex-row justify-between items-center gap-3">
-          <button type="button" onclick="cancelarVoltar()" class="text-xs text-slate-400 hover:text-white underline">&larr; Desistir e Liberar Tema</button>
-          <button type="submit" class="w-full md:w-auto bg-emerald-600 hover:bg-emerald-500 text-white font-black px-8 py-3.5 rounded-xl shadow-lg transition text-sm flex items-center justify-center gap-2">
-            <span>FINALIZAR AUDITORIA & ENVIAR NOTA</span> &rarr;
-          </button>
-        </div>
-      </form>
-    </section>
-
-    <!-- TELA 3: RELATÓRIO INDIVIDUAL -->
-    <section id="telaResultado" class="hidden space-y-6">
-      <div id="areaRelatorioImpressao" class="bg-slate-900 border border-slate-800 p-6 md:p-8 rounded-2xl space-y-6">
-        
-        <!-- MENSAGEM DO PROFESSOR (INCENTIVO E REFLEXÃO) -->
-        <div class="bg-gradient-to-br from-blue-950/70 via-slate-900 to-slate-900 border border-blue-800/60 p-5 md:p-6 rounded-2xl relative overflow-hidden shadow-md">
-          <div class="absolute -right-6 -bottom-6 text-8xl text-blue-600/10 font-serif select-none pointer-events-none">”</div>
-          <div class="flex items-center gap-2 text-amber-400 text-xs font-bold uppercase tracking-wider mb-2">
-            <span>⭐</span> Palavra do Professor à Dupla
-          </div>
-          <h4 class="text-white text-base md:text-lg font-bold mb-2">Parabéns pelo empenho e dedicação operacional!</h4>
-          <p class="text-xs md:text-sm text-slate-300 leading-relaxed italic mb-4">
-            "A gestão de cargas vai muito além do transporte de volumes de um ponto a outro; ela é a engrenagem que move a economia, exige respeito irrestrito à vida, às normas viárias e à integridade de cada processo. Cada decisão tomada neste desafio simula a responsabilidade real que estará nas mãos de vocês no mercado. Confiem na capacidade analítica de vocês, aprendam com cada ponto deste laudo e defendam o seu planejamento com firmeza técnica!"
-          </p>
-          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1 pt-3 border-t border-blue-800/40 text-xs">
-            <span class="text-blue-300 font-semibold font-mono">Prof. Stepherson Licetti Fontoura</span>
-            <span class="text-slate-400 text-[11px]">Especialista em Trânsito, Direito e Educação | Consultor Logístico</span>
-          </div>
-        </div>
-
-        <div class="border-b border-slate-800 pb-4 flex flex-col md:flex-row justify-between items-start md:items-end gap-3">
-          <div>
-            <span class="text-xs font-mono text-blue-400 uppercase tracking-wider">Certificado de Avaliação Operacional</span>
-            <h2 class="text-2xl font-black text-white mt-1">LAUDO TÉCNICO DE EXPEDIÇÃO</h2>
-            <p class="text-xs text-slate-400 mt-1">UC Gestão de Cargas &bull; Auditoria de Parâmetros Operacionais</p>
-          </div>
-          <div class="text-left md:text-right bg-slate-950 p-3.5 rounded-xl border border-slate-800">
-            <span class="text-[11px] text-slate-400 block uppercase font-mono">Nota Técnica Final</span>
-            <span id="scoreFinalNumero" class="text-3xl md:text-4xl font-black font-mono">0.0</span>
-            <span class="text-xs text-slate-500 block">Escala de 0 a 10 (35 Q.)</span>
-          </div>
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs bg-slate-950 p-4 rounded-xl border border-slate-800/80">
-          <div><strong class="text-slate-400 block">Dupla:</strong> <span id="resDuplaNome" class="text-white font-semibold"></span></div>
-          <div><strong class="text-slate-400 block">Cenário Auditado:</strong> <span id="resTemaNome" class="text-white font-semibold"></span></div>
-          <div><strong class="text-slate-400 block">Data/Hora de Registro:</strong> <span id="resHoraEntrega" class="text-white font-mono"></span></div>
-        </div>
-
-        <div>
-          <h3 class="text-sm font-bold uppercase tracking-wide text-slate-300 mb-3">Diagnóstico Questão a Questão:</h3>
-          <div id="resGabaritoDetalhado" class="space-y-3 text-xs max-h-[450px] overflow-y-auto pr-2 custom-scrollbar"></div>
-        </div>
-
-        <div class="flex flex-wrap justify-between items-center gap-3 pt-4 border-t border-slate-800 no-print">
-          <button onclick="alternarAba('telaRanking')" class="bg-blue-600 hover:bg-blue-500 text-white font-bold px-5 py-2.5 rounded-lg text-xs transition">Ver Colocação no Ranking &rarr;</button>
-          <button onclick="window.print()" class="bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 font-semibold px-5 py-2.5 rounded-lg text-xs transition">Salvar / Imprimir Laudo em PDF</button>
-        </div>
-      </div>
-    </section>
-
-    <!-- TELA 4: RANKING GERAL -->
-    <section id="telaRanking" class="hidden space-y-6">
-      <div class="flex flex-wrap justify-between items-center gap-3">
-        <div>
-          <h2 class="text-2xl font-black text-white flex items-center gap-2"><span>🏆</span> PLACAR DE AUDITORIA // CLASSIFICAÇÃO</h2>
-          <p class="text-xs text-slate-400">1º Maior Nota (0 a 10) &bull; 2º Ordem de Entrega</p>
-        </div>
-        <button onclick="alternarAba('telaSelecao')" class="text-xs text-slate-400 hover:text-white underline">&larr; Voltar para a Seleção de Temas</button>
-      </div>
-
-      <div class="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-2xl">
-        <div class="overflow-x-auto">
-          <table class="w-full text-left text-sm">
-            <thead class="bg-slate-950 text-slate-400 text-xs uppercase font-mono border-b border-slate-800">
-              <tr>
-                <th class="py-3.5 px-4">Pos.</th>
-                <th class="py-3.5 px-4">Dupla de Operadores</th>
-                <th class="py-3.5 px-4">Cenário / Tema</th>
-                <th class="py-3.5 px-4">Horário Entrega</th>
-                <th class="py-3.5 px-4 text-center">Acertos (de 35)</th>
-                <th class="py-3.5 px-4 text-right">Nota Final</th>
-              </tr>
-            </thead>
-            <tbody id="corpoTabelaRanking" class="divide-y divide-slate-800/60 font-sans"></tbody>
-          </table>
-        </div>
-        <div id="rankingVazioAviso" class="p-8 text-center text-xs text-slate-500 hidden">
-          Nenhuma dupla finalizou a prova ainda.
-        </div>
-      </div>
-    </section>
-
-  </main>
-
-  <!-- RODAPÉ INSTITUCIONAL PERSONALIZADO -->
-  <footer class="text-center py-6 px-4 text-xs text-slate-500 border-t border-slate-900 no-print space-y-1.5 bg-slate-950">
-    <p class="text-slate-400">
-      Simulador de Gestão de Cargas &bull; Desenvolvido com dedicação pedagógica pelo <strong>Prof. Stepherson Fontoura</strong>
-    </p>
-    <p class="text-[11px] text-slate-600">
-      Especialista em Trânsito, Direito e Educação &bull; Projetado para Aulas Práticas de Logística (2026)
-    </p>
-  </footer>
+    <div class="bg-white p-3 border-t text-center">
+      <button id="btn-preview-ok" class="w-full max-w-xs py-2.5 bg-senai-blue text-white rounded-xl font-bold text-xs">
+        Fechar Prévia
+      </button>
+    </div>
+  </div>
 
   <script>
-    const FIREBASE_URL = "https://aula-1929a-default-rtdb.firebaseio.com/";
-    const SENHA_ADMIN = "senai2026";
+    const questionsMeta = [
+      { id: 'p1', num: 1, title: 'Qual é o Tema da palestra?' },
+      { id: 'p2', num: 2, title: 'Qual é o nome da palestrante e sua área de formação?' },
+      { id: 'p3', num: 3, title: 'Na sua opinião, o que esta palestra trouxe que irá agregar conhecimento para você?' },
+      { id: 'p4', num: 4, title: 'Explique como você poderá ajudar outras pessoas, sobre o tema abordado na palestra?' },
+      { id: 'p5', num: 5, title: 'Qual ponto da palestra você mais se identificou ou ainda, qual ponto da palestra que você mais gostou?' }
+    ];
 
-    let temaAtivo = null;
-    let dadosDupla = { aluno1: "", aluno2: "" };
-    let temasOcupadosCache = {};
+    const fields = ['aluno-nome', 'data-input', 'p1', 'p2', 'p3', 'p4', 'p5'];
+    let generatedPdfBlob = null;
+    let generatedFileName = '';
 
-    window.addEventListener('DOMContentLoaded', () => {
-      checarSessaoEmAndamento();
-      renderizarPainelTemas();
-      sincronizarTemasEmTempoReal();
-      sincronizarRankingEmTempoReal();
+    function initDate() {
+      const dateEl = document.getElementById('data-input');
+      const now = new Date();
+      const localDate = new Date(now.getTime() - now.getTimezoneOffset() * 60000).toISOString().split('T')[0];
+      dateEl.value = localDate;
+    }
+
+    function saveDraft() {
+      const draft = {};
+      fields.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) draft[id] = el.value;
+      });
+      localStorage.setItem('senai_relatorio_rascunho_v2', JSON.stringify(draft));
+      const saveText = document.getElementById('save-text');
+      if (saveText) saveText.innerText = 'Rascunho salvo';
+    }
+
+    function loadDraft() {
+      initDate();
+      const saved = localStorage.getItem('senai_relatorio_rascunho_v2');
+      if (!saved) return;
+      try {
+        const draft = JSON.parse(saved);
+        fields.forEach(id => {
+          const el = document.getElementById(id);
+          if (el && draft[id] !== undefined && draft[id] !== '') {
+            el.value = draft[id];
+          }
+        });
+        updateAllCounters();
+      } catch (e) {
+        console.error('Erro ao recuperar rascunho:', e);
+      }
+    }
+
+    function updateCounter(textareaId, counterId) {
+      const el = document.getElementById(textareaId);
+      const cnt = document.getElementById(counterId);
+      if (!el || !cnt) return;
+      const count = el.value.length;
+      cnt.innerText = `${count} caracteres`;
+      if (count > 250) {
+        cnt.className = 'text-emerald-600 font-semibold';
+      } else {
+        cnt.className = 'text-slate-400';
+      }
+    }
+
+    function updateAllCounters() {
+      for (let i = 1; i <= 5; i++) {
+        updateCounter(`p${i}`, `p${i}-counter`);
+      }
+    }
+
+    fields.forEach(id => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      el.addEventListener('input', () => {
+        const saveText = document.getElementById('save-text');
+        if (saveText) saveText.innerText = 'Salvando...';
+        saveDraft();
+        if (id.startsWith('p')) {
+          updateCounter(id, `${id}-counter`);
+        }
+      });
     });
 
-    function alternarAba(abaId) {
-      ['telaSelecao', 'telaQuestoes', 'telaResultado', 'telaRanking'].forEach(id => {
-        document.getElementById(id).classList.add('hidden');
-      });
-      document.getElementById(abaId).classList.remove('hidden');
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+    function formatSafeFilename(studentName) {
+      const normalized = studentName
+        .trim()
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .replace(/[^a-zA-Z0-9\s]/g, "")
+        .replace(/\s+/g, "_");
+      return `Relatorio_Observacao_Atividade_${normalized || 'Aluno'}.pdf`;
     }
 
-    // GESTÃO DOCENTE / ADMIN
-    function solicitarAcessoAdmin() {
-      const senha = prompt("Acesso Restrito ao Professor.\nDigite a senha mestra:");
-      if (senha === SENHA_ADMIN) {
-        abrirModalAdmin();
-      } else if (senha !== null) {
-        alert("Senha incorreta!");
+    function formatBrazilianDate(isoDateStr) {
+      if (!isoDateStr) return '';
+      const parts = isoDateStr.split('-');
+      if (parts.length === 3) {
+        return `${parts[2]}/${parts[1]}/${parts[0]}`;
       }
+      return isoDateStr;
     }
 
-    function abrirModalAdmin() {
-      atualizarListaAdmin();
-      document.getElementById('modalAdmin').classList.remove('hidden');
-    }
-
-    function fecharModalAdmin() {
-      document.getElementById('modalAdmin').classList.add('hidden');
-    }
-
-    function atualizarListaAdmin() {
-      const container = document.getElementById('listaTemasAdmin');
-      container.innerHTML = "";
-
-      window.BANCO_TEMAS.forEach(t => {
-        const ocupadoPor = temasOcupadosCache[t.id];
-        const item = document.createElement('div');
-        item.className = "flex justify-between items-center p-2.5 rounded-xl border " + 
-          (ocupadoPor ? "bg-slate-950 border-rose-900/60" : "bg-slate-950/60 border-slate-800");
-
-        item.innerHTML = `
-          <div>
-            <span class="font-bold text-slate-200">#${t.id} - ${t.nome}</span>
-            <span class="block text-[11px] ${ocupadoPor ? 'text-rose-400 font-medium' : 'text-emerald-400'}">
-              ${ocupadoPor ? `Ocupado por: ${ocupadoPor}` : 'Livre'}
-            </span>
-          </div>
-          ${
-            ocupadoPor 
-              ? `<button onclick="liberarTemaIndividual(${t.id})" class="bg-rose-900 hover:bg-rose-800 text-rose-100 px-2.5 py-1 rounded text-xs font-semibold transition">Liberar</button>`
-              : `<span class="text-xs text-slate-600 font-mono">Disponível</span>`
-          }
-        `;
-        container.appendChild(item);
-      });
-    }
-
-    async function liberarTemaIndividual(temaId) {
-      if (confirm(`Liberar o Tema #${temaId}? Ele ficará disponível imediatamente para qualquer dupla.`)) {
-        await fetch(`${FIREBASE_URL}/temas_ocupados/${temaId}.json`, { method: 'DELETE' });
-        delete temasOcupadosCache[temaId];
-        atualizarListaAdmin();
-        renderizarPainelTemas();
-      }
-    }
-
-    async function liberarTodosOsTemas() {
-      if (confirm("ATENÇÃO: Deseja desocupar TODOS os 15 temas de uma vez?")) {
-        await fetch(`${FIREBASE_URL}/temas_ocupados.json`, { method: 'DELETE' });
-        temasOcupadosCache = {};
-        atualizarListaAdmin();
-        renderizarPainelTemas();
-        alert("Todos os 15 temas foram liberados!");
-      }
-    }
-
-    async function zerarPlacarRanking() {
-      if (confirm("ATENÇÃO: Deseja apagar todas as notas do ranking? O placar ficará zerado.")) {
-        await fetch(`${FIREBASE_URL}/ranking.json`, { method: 'DELETE' });
-        atualizarVisualRanking([]);
-        alert("O ranking foi reiniciado com sucesso!");
-      }
-    }
-
-    // PERSISTÊNCIA E SESSÃO
-    function checarSessaoEmAndamento() {
-      const sessaoRaw = localStorage.getItem('tms_sessao_ativa');
-      if (!sessaoRaw) return;
-
-      try {
-        const sessao = JSON.parse(sessaoRaw);
-        if (sessao && sessao.temaId && sessao.aluno1) {
-          dadosDupla = { aluno1: sessao.aluno1, aluno2: sessao.aluno2 };
-          document.getElementById('campoAluno1').value = sessao.aluno1;
-          document.getElementById('campoAluno2').value = sessao.aluno2;
-
-          const tema = window.BANCO_TEMAS.find(t => t.id === sessao.temaId);
-          if (tema) {
-            document.getElementById('txtSessaoDupla').innerText = `${sessao.aluno1} & ${sessao.aluno2}`;
-            document.getElementById('txtSessaoTema').innerText = tema.nome;
-            document.getElementById('bannerSessaoRecuperada').classList.remove('hidden');
-          }
-        }
-      } catch (e) {
-        localStorage.removeItem('tms_sessao_ativa');
-      }
-    }
-
-    function retomarSessaoSalva() {
-      const sessao = JSON.parse(localStorage.getItem('tms_sessao_ativa'));
-      temaAtivo = window.BANCO_TEMAS.find(t => t.id === sessao.temaId);
-      carregarQuestionario();
-    }
-
-    function descartarSessaoSalva() {
-      if (confirm("Deseja descartar a sessão em andamento? As respostas salvas serão apagadas.")) {
-        const sessao = JSON.parse(localStorage.getItem('tms_sessao_ativa'));
-        if (sessao && sessao.temaId) {
-          fetch(`${FIREBASE_URL}/temas_ocupados/${sessao.temaId}.json`, { method: 'DELETE' });
-        }
-        localStorage.removeItem('tms_sessao_ativa');
-        document.getElementById('bannerSessaoRecuperada').classList.add('hidden');
-        renderizarPainelTemas();
-      }
-    }
-
-    function atualizarEstadoBotoes() {
-      renderizarPainelTemas();
-    }
-
-    function renderizarPainelTemas(ocupados = temasOcupadosCache) {
-      const grid = document.getElementById('gridTemas');
-      grid.innerHTML = "";
-      let livres = 0;
-
-      const a1Atual = document.getElementById('campoAluno1').value.trim().toLowerCase();
-      const a2Atual = document.getElementById('campoAluno2').value.trim().toLowerCase();
-      const minhaIdentificacao = (a1Atual && a2Atual) ? `${a1Atual} & ${a2Atual}` : "";
-
-      window.BANCO_TEMAS.forEach(tema => {
-        const ocupadoPor = ocupados[tema.id];
-        if (!ocupadoPor) livres++;
-
-        const souDono = ocupadoPor && minhaIdentificacao && (ocupadoPor.toLowerCase() === minhaIdentificacao);
-
-        const card = document.createElement('div');
-        card.className = "p-5 rounded-2xl border transition flex flex-col justify-between " + 
-          (ocupadoPor && !souDono
-            ? "bg-slate-900/40 border-slate-800/80 opacity-60 cursor-not-allowed" 
-            : "bg-slate-900 border-slate-800 hover:border-blue-500 shadow-sm");
-
-        card.innerHTML = `
-          <div>
-            <div class="flex justify-between items-start mb-2">
-              <span class="text-[10px] font-mono px-2 py-0.5 rounded-md font-bold ${
-                souDono 
-                  ? 'bg-blue-950 text-blue-400 border border-blue-800' 
-                  : (ocupadoPor ? 'bg-rose-950 text-rose-400 border border-rose-800' : 'bg-emerald-950 text-emerald-400 border border-emerald-800')
-              }">
-                ${souDono ? 'SEU TEMA RESERVADO' : (ocupadoPor ? 'TEMA BLOQUEADO' : 'DISPONÍVEL')}
-              </span>
-              <span class="text-xs text-slate-500 font-mono">#${String(tema.id).padStart(2, '0')}</span>
-            </div>
-            <h3 class="font-bold text-white text-sm md:text-base mb-1">${tema.nome}</h3>
-            <p class="text-xs text-slate-400 leading-relaxed mb-4">${tema.desc}</p>
-          </div>
-          <div>
-            ${
-              souDono
-                ? `<button onclick="escolherTema(${tema.id})" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2.5 rounded-xl text-xs transition shadow-md flex items-center justify-center gap-1.5">
-                    <span>🔄</span> Retomar Sua Prova &rarr;
-                   </button>`
-                : (ocupadoPor 
-                    ? `<div class="text-[11px] text-rose-400 font-medium bg-rose-950/40 p-2 rounded-lg border border-rose-900/50">🔒 Reservado para: <strong>${ocupadoPor}</strong></div>`
-                    : `<button onclick="escolherTema(${tema.id})" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-2.5 rounded-xl text-xs transition shadow-md">
-                        Selecionar e Travar Este Tema &rarr;
-                       </button>`)
-            }
-          </div>
-        `;
-        grid.appendChild(card);
+    /**
+     * Builds the PDF directly into vector text, lines, and rects using jsPDF.
+     * This guarantees NO blank pages on mobile devices (unlike html2canvas).
+     */
+    function buildVectorPdf() {
+      const { jsPDF } = window.jspdf;
+      // Portrait, millimeters, A4
+      const doc = new jsPDF({
+        orientation: 'portrait',
+        unit: 'mm',
+        format: 'a4'
       });
 
-      document.getElementById('contadorLivres').innerText = `${livres} de ${window.BANCO_TEMAS.length} disponíveis`;
-    }
+      const alunoNome = document.getElementById('aluno-nome').value.trim() || 'Aluno Não Identificado';
+      const rawDate = document.getElementById('data-input').value;
+      const dataFormatada = formatBrazilianDate(rawDate);
 
-    async function escolherTema(temaId) {
-      const a1 = document.getElementById('campoAluno1').value.trim();
-      const a2 = document.getElementById('campoAluno2').value.trim();
+      const pageWidth = 210;
+      const pageHeight = 297;
+      const margin = 14;
+      const contentWidth = pageWidth - (margin * 2); // 182 mm
+      let currentY = margin;
 
-      if (!a1 || !a2) {
-        alert("Atenção: É obrigatório informar o nome dos DOIS integrantes da dupla!");
-        document.getElementById('campoAluno1').focus();
-        return;
-      }
-
-      dadosDupla = { aluno1: a1, aluno2: a2 };
-      const identificacao = `${a1} & ${a2}`;
-
-      try {
-        const resChecagem = await fetch(`${FIREBASE_URL}/temas_ocupados/${temaId}.json`);
-        const ocupado = await resChecagem.json();
+      function renderHeader() {
+        // SENAI Navy top stripe
+        doc.setFillColor(0, 92, 169); // #005CA9
+        doc.roundedRect(margin, currentY, 28, 12, 1.5, 1.5, 'F');
         
-        if (ocupado && ocupado.toLowerCase() !== identificacao.toLowerCase()) {
-          alert(`Este tema acabou de ser travado pela dupla: ${ocupado}! Escolha outro cenário.`);
-          return;
+        doc.setTextColor(255, 255, 255);
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(14);
+        doc.text('SENAI', margin + 14, currentY + 8, { align: 'center' });
+
+        // Title and Subtitle
+        doc.setTextColor(0, 51, 102); // #003366
+        doc.setFontSize(12);
+        doc.setFont('helvetica', 'bold');
+        doc.text('RELATÓRIO DE OBSERVAÇÃO DE ATIVIDADE', margin + 33, currentY + 5.5);
+
+        doc.setFontSize(8.5);
+        doc.setTextColor(100, 116, 139);
+        doc.setFont('helvetica', 'normal');
+        doc.text('Serviço Nacional de Aprendizagem Industrial • Formação Profissional', margin + 33, currentY + 10.5);
+
+        // Divider Line
+        currentY += 16;
+        doc.setDrawColor(0, 92, 169);
+        doc.setLineWidth(0.8);
+        doc.line(margin, currentY, pageWidth - margin, currentY);
+
+        currentY += 4;
+
+        // Metadata box
+        doc.setFillColor(248, 250, 252); // slate-50
+        doc.setDrawColor(203, 213, 225); // border slate-300
+        doc.setLineWidth(0.3);
+        doc.roundedRect(margin, currentY, contentWidth, 23, 2, 2, 'FD');
+
+        doc.setFontSize(8.5);
+        
+        // Row 1
+        doc.setFont('helvetica', 'bold');
+        doc.setTextColor(71, 85, 105);
+        doc.text('Docente:', margin + 3, currentY + 5.5);
+        doc.setFont('helvetica', 'normal');
+        doc.setTextColor(15, 23, 42);
+        doc.text('Prof. Stepherson Licetti Fontoura', margin + 20, currentY + 5.5);
+
+        doc.setFont('helvetica', 'bold');
+        doc.setTextColor(71, 85, 105);
+        doc.text('Curso:', margin + 95, currentY + 5.5);
+        doc.setFont('helvetica', 'normal');
+        doc.setTextColor(15, 23, 42);
+        doc.text('Assistente de Logística', margin + 107, currentY + 5.5);
+
+        // Row 2
+        doc.setFont('helvetica', 'bold');
+        doc.setTextColor(71, 85, 105);
+        doc.text('Período:', margin + 3, currentY + 11.5);
+        doc.setFont('helvetica', 'normal');
+        doc.setTextColor(15, 23, 42);
+        doc.text('Noturno', margin + 20, currentY + 11.5);
+
+        doc.setFont('helvetica', 'bold');
+        doc.setTextColor(71, 85, 105);
+        doc.text('Data:', margin + 95, currentY + 11.5);
+        doc.setFont('helvetica', 'normal');
+        doc.setTextColor(15, 23, 42);
+        doc.text(dataFormatada, margin + 107, currentY + 11.5);
+
+        // Row 3 (Student highlight)
+        doc.setFillColor(238, 242, 246);
+        doc.rect(margin + 0.3, currentY + 14.5, contentWidth - 0.6, 8, 'F');
+
+        doc.setFont('helvetica', 'bold');
+        doc.setTextColor(0, 92, 169);
+        doc.text('ALUNO(A):', margin + 3, currentY + 20);
+        doc.setTextColor(0, 51, 102);
+        doc.setFontSize(9.5);
+        doc.text(alunoNome.toUpperCase(), margin + 23, currentY + 20);
+
+        currentY += 28;
+      }
+
+      function renderFooter(pageNumber, totalPages) {
+        doc.setFontSize(7.5);
+        doc.setFont('helvetica', 'normal');
+        doc.setTextColor(148, 163, 184);
+        doc.text(`Relatório de Observação de Atividade • Aluno(a): ${alunoNome}`, margin, pageHeight - 8);
+        doc.text(`Página ${pageNumber} de ${totalPages}`, pageWidth - margin, pageHeight - 8, { align: 'right' });
+      }
+
+      renderHeader();
+
+      // Render the 5 Questions & Answers
+      questionsMeta.forEach((q) => {
+        const rawText = document.getElementById(q.id).value.trim() || '(Não respondido pelo aluno)';
+        
+        // Split answer to fit contentWidth
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(8.5);
+        const splitLines = doc.splitTextToSize(rawText, contentWidth - 6);
+        const textBlockHeight = (splitLines.length * 4.2) + 6;
+        const totalQuestionHeight = 7 + textBlockHeight + 4;
+
+        // Check if question fits on page, else create new page
+        if (currentY + totalQuestionHeight > pageHeight - 24) {
+          doc.addPage();
+          currentY = margin;
+          
+          // Mini banner on follow-up pages
+          doc.setFillColor(0, 92, 169);
+          doc.rect(margin, currentY, contentWidth, 2, 'F');
+          currentY += 6;
+          doc.setFontSize(8);
+          doc.setFont('helvetica', 'bold');
+          doc.setTextColor(100, 116, 139);
+          doc.text(`Continuação - Relatório de Observação (${alunoNome})`, margin, currentY);
+          currentY += 6;
         }
 
-        await fetch(`${FIREBASE_URL}/temas_ocupados/${temaId}.json`, {
-          method: 'PUT',
-          body: JSON.stringify(identificacao)
+        // Question header bar
+        doc.setFillColor(235, 243, 250);
+        doc.setDrawColor(0, 92, 169);
+        doc.setLineWidth(0.3);
+        doc.rect(margin, currentY, contentWidth, 6, 'FD');
+
+        // Blue Accent strip on the left
+        doc.setFillColor(0, 92, 169);
+        doc.rect(margin, currentY, 2.5, 6, 'F');
+
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(8.5);
+        doc.setTextColor(0, 51, 102);
+        doc.text(`${q.num}. ${q.title}`, margin + 5, currentY + 4.3);
+
+        currentY += 6;
+
+        // Answer box
+        doc.setFillColor(255, 255, 255);
+        doc.setDrawColor(226, 232, 240);
+        doc.setLineWidth(0.3);
+        doc.rect(margin, currentY, contentWidth, textBlockHeight, 'FD');
+
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(8.5);
+        doc.setTextColor(30, 41, 59);
+
+        let lineY = currentY + 4.2;
+        splitLines.forEach(line => {
+          doc.text(line, margin + 3, lineY);
+          lineY += 4.2;
         });
 
-        salvarSessaoLocal(temaId);
-
-      } catch (e) {
-        console.error("Erro Firebase:", e);
-      }
-
-      temaAtivo = window.BANCO_TEMAS.find(t => t.id === temaId);
-      carregarQuestionario();
-    }
-
-    function salvarSessaoLocal(temaId) {
-      const sessao = {
-        aluno1: dadosDupla.aluno1,
-        aluno2: dadosDupla.aluno2,
-        temaId: temaId,
-        respostas: recuperarRespostasSalvas()
-      };
-      localStorage.setItem('tms_sessao_ativa', JSON.stringify(sessao));
-    }
-
-    function recuperarRespostasSalvas() {
-      const sessaoRaw = localStorage.getItem('tms_sessao_ativa');
-      if (!sessaoRaw) return {};
-      try {
-        const s = JSON.parse(sessaoRaw);
-        return s.respostas || {};
-      } catch (e) {
-        return {};
-      }
-    }
-
-    function salvarRespostaIndividual(qId, letra) {
-      const respostas = recuperarRespostasSalvas();
-      respostas[qId] = letra;
-      const sessaoRaw = localStorage.getItem('tms_sessao_ativa');
-      if (sessaoRaw) {
-        const s = JSON.parse(sessaoRaw);
-        s.respostas = respostas;
-        localStorage.setItem('tms_sessao_ativa', JSON.stringify(s));
-      }
-      atualizarProgresso();
-    }
-
-    function carregarQuestionario() {
-      document.getElementById('badgeTemaQuestoes').innerText = `Cenário #${String(temaAtivo.id).padStart(2, '0')} • 35 Questões`;
-      document.getElementById('tituloTemaQuestoes').innerText = temaAtivo.nome;
-      document.getElementById('subtituloDuplaQuestoes').innerText = `Dupla Operacional: ${dadosDupla.aluno1} e ${dadosDupla.aluno2}`;
-
-      const container = document.getElementById('listaQuestoesContainer');
-      container.innerHTML = "";
-
-      const respostasPrevia = recuperarRespostasSalvas();
-
-      temaAtivo.questoes.forEach((q) => {
-        const cardQ = document.createElement('div');
-        cardQ.className = "bg-slate-900 border border-slate-800 p-5 rounded-2xl space-y-3";
-        cardQ.id = `bloco_questao_${q.id}`;
-
-        const optionsHtml = ['A', 'B', 'C', 'D'].map(letra => {
-          const checked = respostasPrevia[q.id] === letra ? "checked" : "";
-          return `
-            <label class="flex items-start gap-2.5 p-2.5 bg-slate-950 rounded-xl border border-slate-800 hover:border-slate-700 cursor-pointer transition">
-              <input type="radio" name="resp_${q.id}" value="${letra}" ${checked} onchange="salvarRespostaIndividual(${q.id}, '${letra}')" class="mt-0.5 text-blue-600">
-              <span class="text-slate-300"><strong class="text-white font-mono">(${letra})</strong> ${q.opcoes[letra]}</span>
-            </label>
-          `;
-        }).join('');
-
-        cardQ.innerHTML = `
-          <div class="flex justify-between items-center border-b border-slate-800 pb-2">
-            <span class="text-xs font-mono font-bold text-blue-400">QUESTÃO ${String(q.id).padStart(2, '0')} / 35</span>
-            <span class="text-[11px] font-mono text-slate-500 uppercase">~0,285 pts</span>
-          </div>
-          <p class="text-sm font-semibold text-slate-100 leading-snug">${q.enunciado}</p>
-          <div class="space-y-2 pt-1 text-xs">${optionsHtml}</div>
-        `;
-        container.appendChild(cardQ);
+        currentY += textBlockHeight + 4;
       });
 
-      atualizarProgresso();
-      alternarAba('telaQuestoes');
-    }
-
-    function atualizarProgresso() {
-      if (!temaAtivo) return;
-      let preenchidas = 0;
-      temaAtivo.questoes.forEach(q => {
-        if (document.querySelector(`input[name="resp_${q.id}"]:checked`)) preenchidas++;
-      });
-      document.getElementById('contadorRespondidas').innerText = `${preenchidas} / 35`;
-      document.getElementById('barraProgresso').style.width = `${(preenchidas / 35) * 100}%`;
-    }
-
-    function cancelarVoltar() {
-      if (confirm("Deseja realmente desistir desta tentativa? O tema será desocupado no Firebase e suas respostas locais apagadas.")) {
-        fetch(`${FIREBASE_URL}/temas_ocupados/${temaAtivo.id}.json`, { method: 'DELETE' });
-        localStorage.removeItem('tms_sessao_ativa');
-        document.getElementById('bannerSessaoRecuperada').classList.add('hidden');
-        temaAtivo = null;
-        alternarAba('telaSelecao');
+      // Signature area at the end
+      if (currentY + 22 > pageHeight - 15) {
+        doc.addPage();
+        currentY = margin + 10;
+      } else {
+        currentY += 5;
       }
+
+      doc.setDrawColor(148, 163, 184);
+      doc.setLineWidth(0.3);
+      
+      const sigColWidth = 75;
+      // Student Signature Line
+      doc.line(margin + 5, currentY + 12, margin + 5 + sigColWidth, currentY + 12);
+      doc.setFontSize(7.5);
+      doc.setFont('helvetica', 'bold');
+      doc.setTextColor(71, 85, 105);
+      doc.text(alunoNome, margin + 5 + (sigColWidth / 2), currentY + 16, { align: 'center' });
+      doc.setFont('helvetica', 'normal');
+      doc.text('Assinatura do Aluno(a)', margin + 5 + (sigColWidth / 2), currentY + 19.5, { align: 'center' });
+
+      // Teacher Line
+      const teacherX = pageWidth - margin - 5 - sigColWidth;
+      doc.line(teacherX, currentY + 12, teacherX + sigColWidth, currentY + 12);
+      doc.setFont('helvetica', 'bold');
+      doc.text('Prof. Stepherson Licetti Fontoura', teacherX + (sigColWidth / 2), currentY + 16, { align: 'center' });
+      doc.setFont('helvetica', 'normal');
+      doc.text('Docente / Avaliador SENAI', teacherX + (sigColWidth / 2), currentY + 19.5, { align: 'center' });
+
+      // Number all pages
+      const totalPages = doc.internal.getNumberOfPages();
+      for (let i = 1; i <= totalPages; i++) {
+        doc.setPage(i);
+        renderFooter(i, totalPages);
+      }
+
+      return doc;
     }
 
-    document.getElementById('formQuestoes').addEventListener('submit', async function(e) {
-      e.preventDefault();
+    async function handleGeneratePdf() {
+      const alunoInput = document.getElementById('aluno-nome');
+      const alunoNome = alunoInput.value.trim();
+      const errEl = document.getElementById('error-nome');
 
-      let faltantes = [];
-      temaAtivo.questoes.forEach(q => {
-        if (!document.querySelector(`input[name="resp_${q.id}"]:checked`)) faltantes.push(q.id);
-      });
-
-      if (faltantes.length > 0) {
-        alert(`Atenção: Existem ${faltantes.length} questões sem resposta! Responda todas antes de enviar.`);
-        document.getElementById(`bloco_questao_${faltantes[0]}`).scrollIntoView({ behavior: 'smooth', block: 'center' });
+      if (!alunoNome) {
+        errEl.classList.remove('hidden');
+        alunoInput.focus();
+        alunoInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
         return;
       }
+      errEl.classList.add('hidden');
 
-      let acertos = 0;
-      let diagnostico = [];
+      const modalLoading = document.getElementById('modal-loading');
+      modalLoading.classList.remove('hidden');
 
-      temaAtivo.questoes.forEach(q => {
-        const marcada = document.querySelector(`input[name="resp_${q.id}"]:checked`).value;
-        const correto = (marcada === q.correta);
-        if (correto) acertos++;
+      setTimeout(() => {
+        try {
+          const doc = buildVectorPdf();
+          generatedFileName = formatSafeFilename(alunoNome);
+          generatedPdfBlob = doc.output('blob');
 
-        diagnostico.push({
-          numero: q.id,
-          enunciado: q.enunciado,
-          marcada: marcada,
-          correta: q.correta,
-          acertou: correto,
-          explicacao: q.explicacao
-        });
-      });
+          modalLoading.classList.add('hidden');
+          document.getElementById('success-filename').innerText = generatedFileName;
+          document.getElementById('modal-success').classList.remove('hidden');
+        } catch (err) {
+          modalLoading.classList.add('hidden');
+          console.error('Erro na criação do PDF:', err);
+          showToast('Falha na geração do PDF. Tente novamente.');
+        }
+      }, 250);
+    }
 
-      const notaDecimal = ((acertos / 35) * 10).toFixed(1);
-      const agoraStr = new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-
-      const registro = {
-        dupla: `${dadosDupla.aluno1} e ${dadosDupla.aluno2}`,
-        tema: temaAtivo.nome,
-        acertos: acertos,
-        nota: parseFloat(notaDecimal),
-        hora: agoraStr,
-        timestamp: Date.now()
-      };
-
-      try {
-        await fetch(`${FIREBASE_URL}/ranking.json`, {
-          method: 'POST',
-          body: JSON.stringify(registro)
-        });
-      } catch(err) {
-        console.error(err);
+    async function handleWhatsAppShare() {
+      if (!generatedPdfBlob) {
+        await handleGeneratePdf();
+        if (!generatedPdfBlob) return;
       }
 
-      localStorage.removeItem('tms_sessao_ativa');
-      document.getElementById('bannerSessaoRecuperada').classList.add('hidden');
+      const alunoNome = document.getElementById('aluno-nome').value.trim();
+      const file = new File([generatedPdfBlob], generatedFileName, { type: 'application/pdf' });
 
-      document.getElementById('resDuplaNome').innerText = registro.dupla;
-      document.getElementById('resTemaNome').innerText = registro.tema;
-      document.getElementById('resHoraEntrega').innerText = registro.hora;
+      // Direct Web Share API (Android & iOS Safari)
+      if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        try {
+          await navigator.share({
+            title: 'Relatório de Observação de Atividade - SENAI',
+            text: `Olá Professor! Segue meu relatório de observação da palestra (${alunoNome} - Assistente de Logística Noturno).`,
+            files: [file]
+          });
+          return;
+        } catch (err) {
+          if (err.name !== 'AbortError') {
+            console.warn('Erro ao compartilhar arquivo, aplicando plano alternativo:', err);
+            executeFallbackShare(file, alunoNome);
+          }
+        }
+      } else {
+        executeFallbackShare(file, alunoNome);
+      }
+    }
 
-      const scoreEl = document.getElementById('scoreFinalNumero');
-      scoreEl.innerText = `${notaDecimal}`;
-      scoreEl.className = "text-4xl font-black font-mono " + (parseFloat(notaDecimal) >= 7.0 ? "text-emerald-400" : "text-amber-400");
+    function executeFallbackShare(file, alunoNome) {
+      // 1. Download file directly onto the phone
+      downloadPdfBlob();
 
-      const diagContainer = document.getElementById('resGabaritoDetalhado');
-      diagContainer.innerHTML = "";
-      diagnostico.forEach(d => {
-        const div = document.createElement('div');
-        div.className = "p-3 rounded-xl border " + (d.acertou ? "bg-emerald-950/20 border-emerald-800/50 text-emerald-200" : "bg-rose-950/20 border-rose-800/50 text-rose-200");
-        div.innerHTML = `
-          <div class="flex justify-between items-center mb-1">
-            <span class="font-mono font-bold">Questão ${d.numero}: ${d.acertou ? '✔️ ACERTOU' : '❌ ERROU'}</span>
-            <span class="font-mono text-[10px]">Marcou (${d.marcada}) • Correta: (${d.correta})</span>
+      // 2. Open WhatsApp with prefilled message
+      const msg = encodeURIComponent(
+        `Olá Professor Stepherson! Segue meu Relatório de Observação da palestra em anexo (${alunoNome} - Assistente de Logística). O arquivo gerado foi ${generatedFileName}.`
+      );
+      showToast('Arquivo baixado! Selecione o arquivo e envie no grupo.');
+      setTimeout(() => {
+        window.open(`https://api.whatsapp.com/send?text=${msg}`, '_blank');
+      }, 1000);
+    }
+
+    function downloadPdfBlob() {
+      if (!generatedPdfBlob) return;
+      const downloadUrl = URL.createObjectURL(generatedPdfBlob);
+      const a = document.createElement('a');
+      a.href = downloadUrl;
+      a.download = generatedFileName;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      setTimeout(() => URL.revokeObjectURL(downloadUrl), 3000);
+    }
+
+    function showToast(msg) {
+      const toast = document.createElement('div');
+      toast.className = 'fixed top-4 inset-x-4 max-w-sm mx-auto bg-slate-900 text-white px-4 py-3 rounded-xl shadow-xl z-50 text-xs flex items-center justify-between border border-slate-700';
+      toast.innerHTML = `<span>${msg}</span><button class="ml-3 text-blue-400 font-bold">OK</button>`;
+      toast.querySelector('button').onclick = () => toast.remove();
+      document.body.appendChild(toast);
+      setTimeout(() => toast.remove(), 4500);
+    }
+
+    function openPreviewModal() {
+      const alunoNome = document.getElementById('aluno-nome').value.trim() || '(Nome do Aluno não informado)';
+      const rawDate = document.getElementById('data-input').value;
+      const dataFormatada = formatBrazilianDate(rawDate);
+
+      let html = `
+        <div class="border-b border-slate-200 pb-3 mb-3">
+          <div class="text-[#005CA9] font-black text-xl tracking-tight">SENAI</div>
+          <h3 class="text-sm font-bold text-slate-800 uppercase mt-1">Relatório de Observação de Atividade</h3>
+          <div class="grid grid-cols-2 gap-2 mt-2 p-2 bg-slate-50 rounded border border-slate-200 text-[11px]">
+            <div><strong>Aluno:</strong> ${alunoNome}</div>
+            <div><strong>Data:</strong> ${dataFormatada}</div>
+            <div><strong>Curso:</strong> Assistente de Logística</div>
+            <div><strong>Período:</strong> Noturno</div>
+            <div class="col-span-2"><strong>Professor:</strong> Prof. Stepherson Licetti Fontoura</div>
           </div>
-          <p class="text-[11px] text-slate-300 mb-1">${d.enunciado}</p>
-          <p class="text-[11px] italic text-slate-400 font-sans">💡 Fundamento: ${d.explicacao}</p>
+        </div>
+        <div class="space-y-3">
+      `;
+
+      questionsMeta.forEach(q => {
+        const val = document.getElementById(q.id).value.trim() || '<span class="text-slate-400 italic">Em branco</span>';
+        html += `
+          <div class="border border-slate-200 rounded p-2.5">
+            <strong class="text-senai-blue block mb-1">${q.num}. ${q.title}</strong>
+            <p class="whitespace-pre-wrap text-slate-700 leading-relaxed">${val}</p>
+          </div>
         `;
-        diagContainer.appendChild(div);
       });
 
-      alert(`Auditoria Finalizada com Sucesso!\nNota: ${notaDecimal} / 10.0\nEnviada ao Ranking!`);
-      alternarAba('telaResultado');
+      html += `</div>`;
+      document.getElementById('preview-content-box').innerHTML = html;
+      document.getElementById('modal-preview').classList.remove('hidden');
+    }
+
+    // Attach Listeners
+    document.getElementById('btn-gerar').addEventListener('click', handleGeneratePdf);
+    document.getElementById('btn-modal-share').addEventListener('click', handleWhatsAppShare);
+    document.getElementById('btn-modal-download').addEventListener('click', downloadPdfBlob);
+    document.getElementById('btn-modal-close').addEventListener('click', () => {
+      document.getElementById('modal-success').classList.add('hidden');
     });
 
-    function sincronizarTemasEmTempoReal() {
-      setInterval(async () => {
-        try {
-          const res = await fetch(`${FIREBASE_URL}/temas_ocupados.json`);
-          const dados = await res.json();
-          temasOcupadosCache = dados || {};
-          if (document.getElementById('telaSelecao').offsetParent !== null) {
-            renderizarPainelTemas(temasOcupadosCache);
+    document.getElementById('btn-preview').addEventListener('click', openPreviewModal);
+    document.getElementById('btn-close-preview').addEventListener('click', () => {
+      document.getElementById('modal-preview').classList.add('hidden');
+    });
+    document.getElementById('btn-preview-ok').addEventListener('click', () => {
+      document.getElementById('modal-preview').classList.add('hidden');
+    });
+
+    // Clear Draft
+    document.getElementById('btn-limpar').addEventListener('click', () => {
+      const confirmBox = document.createElement('div');
+      confirmBox.className = 'fixed inset-0 bg-slate-900/60 z-50 flex items-center justify-center p-4';
+      confirmBox.innerHTML = `
+        <div class="bg-white rounded-2xl p-5 max-w-xs w-full text-center shadow-2xl">
+          <i class="fa-solid fa-triangle-exclamation text-amber-500 text-3xl mb-2"></i>
+          <h4 class="font-bold text-slate-800 text-sm">Apagar respostas salvas?</h4>
+          <p class="text-xs text-slate-500 mt-1 mb-4">Seu texto digitado será excluído do dispositivo.</p>
+          <div class="flex gap-2">
+            <button id="cancel-clear" class="flex-1 py-2 text-xs font-semibold rounded-lg bg-slate-100 text-slate-700">Cancelar</button>
+            <button id="confirm-clear" class="flex-1 py-2 text-xs font-bold rounded-lg bg-senai-red text-white">Sim, apagar</button>
+          </div>
+        </div>
+      `;
+      document.body.appendChild(confirmBox);
+
+      confirmBox.querySelector('#cancel-clear').onclick = () => confirmBox.remove();
+      confirmBox.querySelector('#confirm-clear').onclick = () => {
+        localStorage.removeItem('senai_relatorio_rascunho_v2');
+        fields.forEach(id => {
+          if (id !== 'data-input') {
+            const el = document.getElementById(id);
+            if (el) el.value = '';
           }
-          if (!document.getElementById('modalAdmin').classList.contains('hidden')) {
-            atualizarListaAdmin();
-          }
-        } catch(e) {}
-      }, 3000);
-    }
+        });
+        updateAllCounters();
+        confirmBox.remove();
+        showToast('Respostas apagadas com sucesso.');
+      };
+    });
 
-    function sincronizarRankingEmTempoReal() {
-      setInterval(async () => {
-        try {
-          const res = await fetch(`${FIREBASE_URL}/ranking.json`);
-          const dados = await res.json();
-          const lista = dados ? Object.values(dados) : [];
-          atualizarVisualRanking(lista);
-        } catch(e) {}
-      }, 3000);
-    }
-
-    function atualizarVisualRanking(lista) {
-      const corpo = document.getElementById('corpoTabelaRanking');
-      const aviso = document.getElementById('rankingVazioAviso');
-
-      if (!lista || lista.length === 0) {
-        corpo.innerHTML = "";
-        aviso.classList.remove('hidden');
-        return;
-      }
-      aviso.classList.add('hidden');
-
-      const ordenados = lista.sort((a, b) => b.nota - a.nota || a.timestamp - b.timestamp);
-      corpo.innerHTML = "";
-      ordenados.forEach((item, index) => {
-        const tr = document.createElement('tr');
-        tr.className = index === 0 ? "bg-amber-500/10 font-semibold" : "hover:bg-slate-800/40 transition";
-        tr.innerHTML = `
-          <td class="py-3 px-4 font-mono font-bold">${index === 0 ? '🥇 1º' : index === 1 ? '🥈 2º' : index === 2 ? '🥉 3º' : `${index + 1}º`}</td>
-          <td class="py-3 px-4 text-white font-medium">${item.dupla}</td>
-          <td class="py-3 px-4 text-slate-300 text-xs">${item.tema}</td>
-          <td class="py-3 px-4 font-mono text-xs text-slate-400">${item.hora}</td>
-          <td class="py-3 px-4 text-center font-mono text-xs text-slate-300">${item.acertos} / 35</td>
-          <td class="py-3 px-4 text-right font-mono font-black text-base ${item.nota >= 7.0 ? 'text-emerald-400' : 'text-amber-400'}">${item.nota.toFixed(1)}</td>
-        `;
-        corpo.appendChild(tr);
-      });
-    }
+    // Initialize application on page load
+    window.addEventListener('DOMContentLoaded', () => {
+      loadDraft();
+    });
   </script>
 </body>
 </html>

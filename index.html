@@ -1,741 +1,145 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Desafio Logístico TMS // Gestão de Cargas</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Carrega o banco expandido de 525 questões -->
-  <script src="questoes.js"></script>
-  <style>
-    @media print {
-      body * { visibility: hidden; }
-      #areaRelatorioImpressao, #areaRelatorioImpressao * { visibility: visible; }
-      #areaRelatorioImpressao { position: absolute; left: 0; top: 0; width: 100%; }
-      .no-print { display: none !important; }
-    }
-    .custom-scrollbar::-webkit-scrollbar { width: 6px; }
-    .custom-scrollbar::-webkit-scrollbar-track { background: #1e293b; }
-    .custom-scrollbar::-webkit-scrollbar-thumb { background: #3b82f6; border-radius: 3px; }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#111827">
+<title>Briefing de Software | Análise de Sistemas</title>
+<style>
+:root{--bg:#0b1120;--panel:#111c30;--panel2:#17243b;--line:#293951;--text:#edf4ff;--muted:#a9b8cc;--accent:#67e8f9;--accent2:#818cf8;--good:#86efac;--warn:#fcd34d}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at top,#172746 0,#0b1120 55%);color:var(--text);font:15px/1.55 system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}button,input,textarea,select{font:inherit}button{cursor:pointer}.shell{max-width:1180px;margin:auto;padding:28px 18px 60px}.hero{display:flex;justify-content:space-between;align-items:flex-start;gap:22px;margin-bottom:24px}.eyebrow{color:var(--accent);font-weight:800;text-transform:uppercase;letter-spacing:.13em;font-size:.75rem}.hero h1{font-size:clamp(1.8rem,4vw,3rem);line-height:1.08;margin:8px 0 12px}.hero p{color:var(--muted);max-width:720px;margin:0}.tag{white-space:nowrap;border:1px solid #35516e;border-radius:99px;padding:7px 12px;color:#c7d8f1;font-size:.8rem}.progressbox,.panel{background:rgba(17,28,48,.94);border:1px solid var(--line);border-radius:18px;box-shadow:0 14px 40px #0002}.progressbox{padding:16px 18px;margin-bottom:20px}.progresshead{display:flex;justify-content:space-between;gap:12px;color:var(--muted);font-size:.9rem}.track{height:7px;background:#25344a;border-radius:9px;overflow:hidden;margin-top:10px}.fill{height:100%;width:0;background:linear-gradient(90deg,var(--accent),var(--accent2));transition:width .2s}.layout{display:grid;grid-template-columns:250px minmax(0,1fr);gap:20px;align-items:start}.nav{padding:10px;position:sticky;top:14px}.nav button{width:100%;display:flex;text-align:left;align-items:center;gap:10px;background:transparent;border:0;color:var(--muted);padding:12px;border-radius:10px;margin:2px 0}.nav button.active{background:#203651;color:white}.nav button.done .num{background:#14532d;color:#bbf7d0;border-color:#22c55e}.num{display:grid;place-items:center;width:28px;height:28px;border:1px solid #50647d;border-radius:9px;font-weight:800;flex-shrink:0}.nav small{display:block;font-size:.75rem;opacity:.8}.content{padding:clamp(18px,3vw,32px)}.section{display:none}.section.active{display:block}.section h2{font-size:1.5rem;margin:0 0 5px}.intro{color:var(--muted);margin:0 0 22px}.fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}.field{min-width:0}.field.full{grid-column:1/-1}label{display:block;font-weight:700;font-size:.88rem;margin:0 0 6px;color:#dce8f7}.hint{display:block;color:#8fa3bc;font-size:.77rem;font-weight:400;margin-top:3px}input,textarea,select{width:100%;background:#0a1425;color:var(--text);border:1px solid #354862;border-radius:10px;padding:11px 12px;outline:none}input:focus,textarea:focus,select:focus{border-color:var(--accent);box-shadow:0 0 0 3px #67e8f91c}textarea{min-height:105px;resize:vertical}select{min-height:45px}.checks{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.check{display:flex;gap:9px;align-items:flex-start;background:#0b1628;border:1px solid #2a3d56;border-radius:10px;padding:10px;font-size:.86rem}.check input{width:auto;margin-top:5px;accent-color:#67e8f9}.reqrow{display:grid;grid-template-columns:1fr 1fr auto;gap:8px;margin-bottom:8px}.reqrow input{min-width:0}.remove{background:#3b1b2a;color:#fecdd3;border:1px solid #713047;border-radius:9px;padding:0 12px}.add{background:#182d43;color:var(--accent);border:1px dashed #4e6c88;border-radius:9px;padding:10px 13px}.callout{background:#102b3c;border:1px solid #25516a;border-radius:12px;padding:13px;color:#c8edf8;font-size:.88rem;margin:18px 0}.actions{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-top:26px;padding-top:20px;border-top:1px solid var(--line)}.btn{border:1px solid #405574;background:#1b2a41;color:white;padding:11px 16px;border-radius:10px;font-weight:750}.btn.primary{background:linear-gradient(100deg,#0891b2,#4f46e5);border:0}.btn:disabled{opacity:.35;cursor:not-allowed}.btn.success{border-color:#26754a;color:#bbf7d0;background:#123322}.preview{background:#fff;color:#1f2937;border-radius:10px;padding:20px;max-height:420px;overflow:auto;font-size:.85rem}.preview h3{margin-top:0}.foot{color:#8497b0;text-align:center;font-size:.78rem;margin-top:26px}.toast{position:fixed;bottom:20px;right:20px;background:#143c2a;border:1px solid #2f8054;color:#d1fae5;padding:12px 16px;border-radius:10px;display:none;z-index:5}.muted{color:var(--muted)}@media(max-width:800px){.layout{grid-template-columns:1fr}.nav{position:static;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:3px}.nav button{font-size:.8rem;padding:8px}.hero{display:block}.tag{display:inline-block;margin-top:16px}.fields{grid-template-columns:1fr}.field.full{grid-column:auto}.checks{grid-template-columns:1fr}.reqrow{grid-template-columns:1fr}.remove{padding:8px}.content{padding:18px}}
+@media print{body{background:white;color:#111}.shell{max-width:none;padding:0}.hero,.progressbox,.nav,.actions,.foot,.tag{display:none!important}.layout{display:block}.panel{background:white;border:0;box-shadow:none}.content{padding:0}.section{display:none!important}#review{display:block!important}.preview{max-height:none;overflow:visible;border:0;padding:0}.preview *{color:#111!important}.printtitle{display:block!important}}
+</style>
 </head>
-<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col font-sans selection:bg-blue-600 selection:text-white">
-
-  <!-- CABEÇALHO -->
-  <header class="bg-slate-900 border-b border-slate-800 p-4 sticky top-0 z-50 shadow-lg">
-    <div class="max-w-6xl mx-auto flex flex-wrap justify-between items-center gap-3">
-      <div class="flex items-center gap-3">
-        <span class="w-3 h-3 bg-emerald-500 rounded-full animate-ping"></span>
-        <div>
-          <h1 class="text-lg md:text-xl font-black tracking-wide text-white uppercase">TMS AUDIT // GESTÃO DE CARGAS</h1>
-          <p class="text-xs text-slate-400">15 Duplas &bull; 15 Cenários Exclusivos &bull; Avaliação Técnica de 35 Questões</p>
-        </div>
-      </div>
-      <div class="flex items-center gap-2">
-        <button onclick="alternarAba('telaSelecao')" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition">
-          Painel de Temas
-        </button>
-        <button onclick="alternarAba('telaRanking')" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-blue-600 hover:bg-blue-500 text-white shadow transition flex items-center gap-1.5">
-          <span>🏆</span> Placar / Ranking
-        </button>
-        <!-- BOTÃO DE ACESSO DO PROFESSOR -->
-        <button onclick="solicitarAcessoAdmin()" class="px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-slate-950 hover:bg-slate-800 text-slate-400 hover:text-amber-300 border border-slate-800 transition flex items-center gap-1">
-          <span>⚙️</span> Docente
-        </button>
-      </div>
-    </div>
-  </header>
-
-  <!-- MODAL / PAINEL ADMINISTRATIVO DO PROFESSOR -->
-  <div id="modalAdmin" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-    <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-xl w-full p-6 space-y-5 shadow-2xl">
-      <div class="flex justify-between items-center border-b border-slate-800 pb-3">
-        <div>
-          <h3 class="text-lg font-bold text-white flex items-center gap-2">
-            <span>🛡️</span> Painel de Controle Docente
-          </h3>
-          <p class="text-xs text-slate-400">Gerenciamento direto da base de dados em tempo real</p>
-        </div>
-        <button onclick="fecharModalAdmin()" class="text-slate-400 hover:text-white font-bold text-lg">&times;</button>
-      </div>
-
-      <div class="space-y-3">
-        <div class="flex justify-between items-center">
-          <h4 class="text-xs font-bold uppercase tracking-wider text-slate-300">Status dos 15 Temas</h4>
-          <button onclick="liberarTodosOsTemas()" class="text-[11px] bg-rose-950 hover:bg-rose-900 text-rose-300 border border-rose-800 px-2.5 py-1 rounded transition">
-            Liberar TODOS os Temas
-          </button>
-        </div>
-
-        <div id="listaTemasAdmin" class="max-h-60 overflow-y-auto space-y-2 pr-1 custom-scrollbar text-xs"></div>
-      </div>
-
-      <div class="pt-3 border-t border-slate-800 flex justify-between items-center">
-        <div>
-          <span class="text-xs font-semibold text-slate-300 block">Zerar Placar / Ranking</span>
-          <span class="text-[11px] text-slate-500">Exclui todas as notas e envios de teste</span>
-        </div>
-        <button onclick="zerarPlacarRanking()" class="text-xs bg-amber-950 hover:bg-amber-900 text-amber-300 border border-amber-800 px-3 py-1.5 rounded-lg transition font-semibold">
-          Zerar Ranking
-        </button>
-      </div>
-
-      <div class="pt-2 text-right">
-        <button onclick="fecharModalAdmin()" class="bg-slate-800 hover:bg-slate-700 text-white text-xs px-4 py-2 rounded-lg transition">Fechar Painel</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- CONTEÚDO PRINCIPAL -->
-  <main class="flex-grow max-w-6xl w-full mx-auto p-4 md:p-6 space-y-6">
-
-    <!-- BANNER DE SESSÃO / CONEXÃO -->
-    <div class="no-print space-y-2">
-      <div class="bg-slate-900/80 border border-slate-800 px-4 py-2.5 rounded-xl flex items-center justify-between text-xs">
-        <div class="flex items-center gap-2">
-          <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
-          <span class="text-slate-300">Sincronização Ativa: <strong>Firebase Realtime Database</strong></span>
-        </div>
-        <span class="text-slate-500 font-mono text-[11px]">15 Cenários &bull; Salvamento Automático Ativo</span>
-      </div>
-
-      <div id="bannerSessaoRecuperada" class="hidden bg-blue-950/60 border border-blue-800/80 p-3 rounded-xl flex items-center justify-between text-xs">
-        <div class="flex items-center gap-2 text-blue-200">
-          <span>🔄</span>
-          <span>Sessão em andamento detectada para: <strong id="txtSessaoDupla" class="text-white"></strong> (<span id="txtSessaoTema" class="text-blue-300"></span>)</span>
-        </div>
-        <div class="flex gap-2">
-          <button onclick="retomarSessaoSalva()" class="bg-blue-600 hover:bg-blue-500 text-white font-bold px-3 py-1 rounded text-xs">Continuar Prova</button>
-          <button onclick="descartarSessaoSalva()" class="text-slate-400 hover:text-rose-400 text-xs underline">Descartar</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- TELA 1: CADASTRO E SELEÇÃO DE TEMA -->
-    <section id="telaSelecao" class="space-y-6">
-      <div class="bg-slate-900 border border-slate-800 p-5 md:p-6 rounded-2xl shadow-sm">
-        <div class="flex items-center gap-3 mb-2">
-          <span class="w-7 h-7 rounded-lg bg-blue-600/20 text-blue-400 border border-blue-500/30 flex items-center justify-center font-bold text-xs">1</span>
-          <h2 class="text-base md:text-lg font-bold text-white">Identificação da Dupla de Operadores</h2>
-        </div>
-        <p class="text-xs text-slate-400 mb-4">Insira o nome completo dos dois integrantes da dupla. Em seguida, escolham um dos 15 temas disponíveis.</p>
-        
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-          <div>
-            <label class="block text-xs font-semibold text-slate-400 mb-1">Aluno 1:</label>
-            <input type="text" id="campoAluno1" oninput="atualizarEstadoBotoes()" placeholder="Ex.: Lucas Alves" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2.5 text-sm text-white focus:border-blue-500 outline-none">
-          </div>
-          <div>
-            <label class="block text-xs font-semibold text-slate-400 mb-1">Aluno 2:</label>
-            <input type="text" id="campoAluno2" oninput="atualizarEstadoBotoes()" placeholder="Ex.: Mariana Fontes" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2.5 text-sm text-white focus:border-blue-500 outline-none">
-          </div>
-        </div>
-      </div>
-
-      <div>
-        <div class="flex justify-between items-center mb-3">
-          <div class="flex items-center gap-3">
-            <span class="w-7 h-7 rounded-lg bg-blue-600/20 text-blue-400 border border-blue-500/30 flex items-center justify-center font-bold text-xs">2</span>
-            <h2 class="text-base md:text-lg font-bold text-white">Seleção Exclusiva de Cenário Operacional (15 Temas)</h2>
-          </div>
-          <span id="contadorLivres" class="text-xs font-mono bg-slate-800 text-slate-300 px-2.5 py-1 rounded-full border border-slate-700">15 temas disponíveis</span>
-        </div>
-
-        <div id="gridTemas" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
-      </div>
-    </section>
-
-    <!-- TELA 2: QUESTIONÁRIO (35 QUESTÕES) -->
-    <section id="telaQuestoes" class="hidden space-y-6">
-      <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl sticky top-20 z-40 shadow-xl backdrop-blur-md bg-slate-900/95">
-        <div class="flex flex-wrap justify-between items-center gap-3">
-          <div>
-            <span id="badgeTemaQuestoes" class="text-[10px] font-mono uppercase bg-blue-950 text-blue-400 px-2 py-0.5 rounded border border-blue-800">Tema 00</span>
-            <h3 id="tituloTemaQuestoes" class="text-base md:text-lg font-bold text-white mt-1"></h3>
-            <p id="subtituloDuplaQuestoes" class="text-xs text-slate-400"></p>
-          </div>
-          <div class="text-right">
-            <span class="text-xs text-slate-400 block">Progresso da Prova:</span>
-            <span id="contadorRespondidas" class="text-lg font-mono font-black text-emerald-400">0 / 35</span>
-          </div>
-        </div>
-        <div class="w-full bg-slate-800 h-2 rounded-full mt-3 overflow-hidden">
-          <div id="barraProgresso" class="bg-gradient-to-r from-blue-500 to-emerald-500 h-full w-0 transition-all duration-300"></div>
-        </div>
-      </div>
-
-      <form id="formQuestoes" class="space-y-4">
-        <div id="listaQuestoesContainer" class="space-y-4"></div>
-        <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl flex flex-col md:flex-row justify-between items-center gap-3">
-          <button type="button" onclick="cancelarVoltar()" class="text-xs text-slate-400 hover:text-white underline">&larr; Desistir e Liberar Tema</button>
-          <button type="submit" class="w-full md:w-auto bg-emerald-600 hover:bg-emerald-500 text-white font-black px-8 py-3.5 rounded-xl shadow-lg transition text-sm flex items-center justify-center gap-2">
-            <span>FINALIZAR AUDITORIA & ENVIAR NOTA</span> &rarr;
-          </button>
-        </div>
-      </form>
-    </section>
-
-    <!-- TELA 3: RELATÓRIO INDIVIDUAL -->
-    <section id="telaResultado" class="hidden space-y-6">
-      <div id="areaRelatorioImpressao" class="bg-slate-900 border border-slate-800 p-6 md:p-8 rounded-2xl space-y-6">
-        
-        <!-- MENSAGEM DO PROFESSOR (INCENTIVO E REFLEXÃO) -->
-        <div class="bg-gradient-to-br from-blue-950/70 via-slate-900 to-slate-900 border border-blue-800/60 p-5 md:p-6 rounded-2xl relative overflow-hidden shadow-md">
-          <div class="absolute -right-6 -bottom-6 text-8xl text-blue-600/10 font-serif select-none pointer-events-none">”</div>
-          <div class="flex items-center gap-2 text-amber-400 text-xs font-bold uppercase tracking-wider mb-2">
-            <span>⭐</span> Palavra do Professor à Dupla
-          </div>
-          <h4 class="text-white text-base md:text-lg font-bold mb-2">Parabéns pelo empenho e dedicação operacional!</h4>
-          <p class="text-xs md:text-sm text-slate-300 leading-relaxed italic mb-4">
-            "A gestão de cargas vai muito além do transporte de volumes de um ponto a outro; ela é a engrenagem que move a economia, exige respeito irrestrito à vida, às normas viárias e à integridade de cada processo. Cada decisão tomada neste desafio simula a responsabilidade real que estará nas mãos de vocês no mercado. Confiem na capacidade analítica de vocês, aprendam com cada ponto deste laudo e defendam o seu planejamento com firmeza técnica!"
-          </p>
-          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1 pt-3 border-t border-blue-800/40 text-xs">
-            <span class="text-blue-300 font-semibold font-mono">Prof. Stepherson Licetti Fontoura</span>
-            <span class="text-slate-400 text-[11px]">Especialista em Trânsito, Direito e Educação | Consultor Logístico</span>
-          </div>
-        </div>
-
-        <div class="border-b border-slate-800 pb-4 flex flex-col md:flex-row justify-between items-start md:items-end gap-3">
-          <div>
-            <span class="text-xs font-mono text-blue-400 uppercase tracking-wider">Certificado de Avaliação Operacional</span>
-            <h2 class="text-2xl font-black text-white mt-1">LAUDO TÉCNICO DE EXPEDIÇÃO</h2>
-            <p class="text-xs text-slate-400 mt-1">UC Gestão de Cargas &bull; Auditoria de Parâmetros Operacionais</p>
-          </div>
-          <div class="text-left md:text-right bg-slate-950 p-3.5 rounded-xl border border-slate-800">
-            <span class="text-[11px] text-slate-400 block uppercase font-mono">Nota Técnica Final</span>
-            <span id="scoreFinalNumero" class="text-3xl md:text-4xl font-black font-mono">0.0</span>
-            <span class="text-xs text-slate-500 block">Escala de 0 a 10 (35 Q.)</span>
-          </div>
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs bg-slate-950 p-4 rounded-xl border border-slate-800/80">
-          <div><strong class="text-slate-400 block">Dupla:</strong> <span id="resDuplaNome" class="text-white font-semibold"></span></div>
-          <div><strong class="text-slate-400 block">Cenário Auditado:</strong> <span id="resTemaNome" class="text-white font-semibold"></span></div>
-          <div><strong class="text-slate-400 block">Data/Hora de Registro:</strong> <span id="resHoraEntrega" class="text-white font-mono"></span></div>
-        </div>
-
-        <div>
-          <h3 class="text-sm font-bold uppercase tracking-wide text-slate-300 mb-3">Diagnóstico Questão a Questão:</h3>
-          <div id="resGabaritoDetalhado" class="space-y-3 text-xs max-h-[450px] overflow-y-auto pr-2 custom-scrollbar"></div>
-        </div>
-
-        <div class="flex flex-wrap justify-between items-center gap-3 pt-4 border-t border-slate-800 no-print">
-          <button onclick="alternarAba('telaRanking')" class="bg-blue-600 hover:bg-blue-500 text-white font-bold px-5 py-2.5 rounded-lg text-xs transition">Ver Colocação no Ranking &rarr;</button>
-          <button onclick="window.print()" class="bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 font-semibold px-5 py-2.5 rounded-lg text-xs transition">Salvar / Imprimir Laudo em PDF</button>
-        </div>
-      </div>
-    </section>
-
-    <!-- TELA 4: RANKING GERAL -->
-    <section id="telaRanking" class="hidden space-y-6">
-      <div class="flex flex-wrap justify-between items-center gap-3">
-        <div>
-          <h2 class="text-2xl font-black text-white flex items-center gap-2"><span>🏆</span> PLACAR DE AUDITORIA // CLASSIFICAÇÃO</h2>
-          <p class="text-xs text-slate-400">1º Maior Nota (0 a 10) &bull; 2º Ordem de Entrega</p>
-        </div>
-        <button onclick="alternarAba('telaSelecao')" class="text-xs text-slate-400 hover:text-white underline">&larr; Voltar para a Seleção de Temas</button>
-      </div>
-
-      <div class="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-2xl">
-        <div class="overflow-x-auto">
-          <table class="w-full text-left text-sm">
-            <thead class="bg-slate-950 text-slate-400 text-xs uppercase font-mono border-b border-slate-800">
-              <tr>
-                <th class="py-3.5 px-4">Pos.</th>
-                <th class="py-3.5 px-4">Dupla de Operadores</th>
-                <th class="py-3.5 px-4">Cenário / Tema</th>
-                <th class="py-3.5 px-4">Horário Entrega</th>
-                <th class="py-3.5 px-4 text-center">Acertos (de 35)</th>
-                <th class="py-3.5 px-4 text-right">Nota Final</th>
-              </tr>
-            </thead>
-            <tbody id="corpoTabelaRanking" class="divide-y divide-slate-800/60 font-sans"></tbody>
-          </table>
-        </div>
-        <div id="rankingVazioAviso" class="p-8 text-center text-xs text-slate-500 hidden">
-          Nenhuma dupla finalizou a prova ainda.
-        </div>
-      </div>
-    </section>
-
-  </main>
-
-  <!-- RODAPÉ INSTITUCIONAL PERSONALIZADO -->
-  <footer class="text-center py-6 px-4 text-xs text-slate-500 border-t border-slate-900 no-print space-y-1.5 bg-slate-950">
-    <p class="text-slate-400">
-      Simulador de Gestão de Cargas &bull; Desenvolvido com dedicação pedagógica pelo <strong>Prof. Stepherson Fontoura</strong>
-    </p>
-    <p class="text-[11px] text-slate-600">
-      Especialista em Trânsito, Direito e Educação &bull; Projetado para Aulas Práticas de Logística (2026)
-    </p>
-  </footer>
-
-  <script>
-    const FIREBASE_URL = "https://aula-1929a-default-rtdb.firebaseio.com/";
-    const SENHA_ADMIN = "senai2026";
-
-    let temaAtivo = null;
-    let dadosDupla = { aluno1: "", aluno2: "" };
-    let temasOcupadosCache = {};
-
-    window.addEventListener('DOMContentLoaded', () => {
-      checarSessaoEmAndamento();
-      renderizarPainelTemas();
-      sincronizarTemasEmTempoReal();
-      sincronizarRankingEmTempoReal();
-    });
-
-    function alternarAba(abaId) {
-      ['telaSelecao', 'telaQuestoes', 'telaResultado', 'telaRanking'].forEach(id => {
-        document.getElementById(id).classList.add('hidden');
-      });
-      document.getElementById(abaId).classList.remove('hidden');
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-
-    // GESTÃO DOCENTE / ADMIN
-    function solicitarAcessoAdmin() {
-      const senha = prompt("Acesso Restrito ao Professor.\nDigite a senha mestra:");
-      if (senha === SENHA_ADMIN) {
-        abrirModalAdmin();
-      } else if (senha !== null) {
-        alert("Senha incorreta!");
-      }
-    }
-
-    function abrirModalAdmin() {
-      atualizarListaAdmin();
-      document.getElementById('modalAdmin').classList.remove('hidden');
-    }
-
-    function fecharModalAdmin() {
-      document.getElementById('modalAdmin').classList.add('hidden');
-    }
-
-    function atualizarListaAdmin() {
-      const container = document.getElementById('listaTemasAdmin');
-      container.innerHTML = "";
-
-      window.BANCO_TEMAS.forEach(t => {
-        const ocupadoPor = temasOcupadosCache[t.id];
-        const item = document.createElement('div');
-        item.className = "flex justify-between items-center p-2.5 rounded-xl border " + 
-          (ocupadoPor ? "bg-slate-950 border-rose-900/60" : "bg-slate-950/60 border-slate-800");
-
-        item.innerHTML = `
-          <div>
-            <span class="font-bold text-slate-200">#${t.id} - ${t.nome}</span>
-            <span class="block text-[11px] ${ocupadoPor ? 'text-rose-400 font-medium' : 'text-emerald-400'}">
-              ${ocupadoPor ? `Ocupado por: ${ocupadoPor}` : 'Livre'}
-            </span>
-          </div>
-          ${
-            ocupadoPor 
-              ? `<button onclick="liberarTemaIndividual(${t.id})" class="bg-rose-900 hover:bg-rose-800 text-rose-100 px-2.5 py-1 rounded text-xs font-semibold transition">Liberar</button>`
-              : `<span class="text-xs text-slate-600 font-mono">Disponível</span>`
-          }
-        `;
-        container.appendChild(item);
-      });
-    }
-
-    async function liberarTemaIndividual(temaId) {
-      if (confirm(`Liberar o Tema #${temaId}? Ele ficará disponível imediatamente para qualquer dupla.`)) {
-        await fetch(`${FIREBASE_URL}/temas_ocupados/${temaId}.json`, { method: 'DELETE' });
-        delete temasOcupadosCache[temaId];
-        atualizarListaAdmin();
-        renderizarPainelTemas();
-      }
-    }
-
-    async function liberarTodosOsTemas() {
-      if (confirm("ATENÇÃO: Deseja desocupar TODOS os 15 temas de uma vez?")) {
-        await fetch(`${FIREBASE_URL}/temas_ocupados.json`, { method: 'DELETE' });
-        temasOcupadosCache = {};
-        atualizarListaAdmin();
-        renderizarPainelTemas();
-        alert("Todos os 15 temas foram liberados!");
-      }
-    }
-
-    async function zerarPlacarRanking() {
-      if (confirm("ATENÇÃO: Deseja apagar todas as notas do ranking? O placar ficará zerado.")) {
-        await fetch(`${FIREBASE_URL}/ranking.json`, { method: 'DELETE' });
-        atualizarVisualRanking([]);
-        alert("O ranking foi reiniciado com sucesso!");
-      }
-    }
-
-    // PERSISTÊNCIA E SESSÃO
-    function checarSessaoEmAndamento() {
-      const sessaoRaw = localStorage.getItem('tms_sessao_ativa');
-      if (!sessaoRaw) return;
-
-      try {
-        const sessao = JSON.parse(sessaoRaw);
-        if (sessao && sessao.temaId && sessao.aluno1) {
-          dadosDupla = { aluno1: sessao.aluno1, aluno2: sessao.aluno2 };
-          document.getElementById('campoAluno1').value = sessao.aluno1;
-          document.getElementById('campoAluno2').value = sessao.aluno2;
-
-          const tema = window.BANCO_TEMAS.find(t => t.id === sessao.temaId);
-          if (tema) {
-            document.getElementById('txtSessaoDupla').innerText = `${sessao.aluno1} & ${sessao.aluno2}`;
-            document.getElementById('txtSessaoTema').innerText = tema.nome;
-            document.getElementById('bannerSessaoRecuperada').classList.remove('hidden');
-          }
-        }
-      } catch (e) {
-        localStorage.removeItem('tms_sessao_ativa');
-      }
-    }
-
-    function retomarSessaoSalva() {
-      const sessao = JSON.parse(localStorage.getItem('tms_sessao_ativa'));
-      temaAtivo = window.BANCO_TEMAS.find(t => t.id === sessao.temaId);
-      carregarQuestionario();
-    }
-
-    function descartarSessaoSalva() {
-      if (confirm("Deseja descartar a sessão em andamento? As respostas salvas serão apagadas.")) {
-        const sessao = JSON.parse(localStorage.getItem('tms_sessao_ativa'));
-        if (sessao && sessao.temaId) {
-          fetch(`${FIREBASE_URL}/temas_ocupados/${sessao.temaId}.json`, { method: 'DELETE' });
-        }
-        localStorage.removeItem('tms_sessao_ativa');
-        document.getElementById('bannerSessaoRecuperada').classList.add('hidden');
-        renderizarPainelTemas();
-      }
-    }
-
-    function atualizarEstadoBotoes() {
-      renderizarPainelTemas();
-    }
-
-    function renderizarPainelTemas(ocupados = temasOcupadosCache) {
-      const grid = document.getElementById('gridTemas');
-      grid.innerHTML = "";
-      let livres = 0;
-
-      const a1Atual = document.getElementById('campoAluno1').value.trim().toLowerCase();
-      const a2Atual = document.getElementById('campoAluno2').value.trim().toLowerCase();
-      const minhaIdentificacao = (a1Atual && a2Atual) ? `${a1Atual} & ${a2Atual}` : "";
-
-      window.BANCO_TEMAS.forEach(tema => {
-        const ocupadoPor = ocupados[tema.id];
-        if (!ocupadoPor) livres++;
-
-        const souDono = ocupadoPor && minhaIdentificacao && (ocupadoPor.toLowerCase() === minhaIdentificacao);
-
-        const card = document.createElement('div');
-        card.className = "p-5 rounded-2xl border transition flex flex-col justify-between " + 
-          (ocupadoPor && !souDono
-            ? "bg-slate-900/40 border-slate-800/80 opacity-60 cursor-not-allowed" 
-            : "bg-slate-900 border-slate-800 hover:border-blue-500 shadow-sm");
-
-        card.innerHTML = `
-          <div>
-            <div class="flex justify-between items-start mb-2">
-              <span class="text-[10px] font-mono px-2 py-0.5 rounded-md font-bold ${
-                souDono 
-                  ? 'bg-blue-950 text-blue-400 border border-blue-800' 
-                  : (ocupadoPor ? 'bg-rose-950 text-rose-400 border border-rose-800' : 'bg-emerald-950 text-emerald-400 border border-emerald-800')
-              }">
-                ${souDono ? 'SEU TEMA RESERVADO' : (ocupadoPor ? 'TEMA BLOQUEADO' : 'DISPONÍVEL')}
-              </span>
-              <span class="text-xs text-slate-500 font-mono">#${String(tema.id).padStart(2, '0')}</span>
-            </div>
-            <h3 class="font-bold text-white text-sm md:text-base mb-1">${tema.nome}</h3>
-            <p class="text-xs text-slate-400 leading-relaxed mb-4">${tema.desc}</p>
-          </div>
-          <div>
-            ${
-              souDono
-                ? `<button onclick="escolherTema(${tema.id})" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2.5 rounded-xl text-xs transition shadow-md flex items-center justify-center gap-1.5">
-                    <span>🔄</span> Retomar Sua Prova &rarr;
-                   </button>`
-                : (ocupadoPor 
-                    ? `<div class="text-[11px] text-rose-400 font-medium bg-rose-950/40 p-2 rounded-lg border border-rose-900/50">🔒 Reservado para: <strong>${ocupadoPor}</strong></div>`
-                    : `<button onclick="escolherTema(${tema.id})" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-2.5 rounded-xl text-xs transition shadow-md">
-                        Selecionar e Travar Este Tema &rarr;
-                       </button>`)
-            }
-          </div>
-        `;
-        grid.appendChild(card);
-      });
-
-      document.getElementById('contadorLivres').innerText = `${livres} de ${window.BANCO_TEMAS.length} disponíveis`;
-    }
-
-    async function escolherTema(temaId) {
-      const a1 = document.getElementById('campoAluno1').value.trim();
-      const a2 = document.getElementById('campoAluno2').value.trim();
-
-      if (!a1 || !a2) {
-        alert("Atenção: É obrigatório informar o nome dos DOIS integrantes da dupla!");
-        document.getElementById('campoAluno1').focus();
-        return;
-      }
-
-      dadosDupla = { aluno1: a1, aluno2: a2 };
-      const identificacao = `${a1} & ${a2}`;
-
-      try {
-        const resChecagem = await fetch(`${FIREBASE_URL}/temas_ocupados/${temaId}.json`);
-        const ocupado = await resChecagem.json();
-        
-        if (ocupado && ocupado.toLowerCase() !== identificacao.toLowerCase()) {
-          alert(`Este tema acabou de ser travado pela dupla: ${ocupado}! Escolha outro cenário.`);
-          return;
-        }
-
-        await fetch(`${FIREBASE_URL}/temas_ocupados/${temaId}.json`, {
-          method: 'PUT',
-          body: JSON.stringify(identificacao)
-        });
-
-        salvarSessaoLocal(temaId);
-
-      } catch (e) {
-        console.error("Erro Firebase:", e);
-      }
-
-      temaAtivo = window.BANCO_TEMAS.find(t => t.id === temaId);
-      carregarQuestionario();
-    }
-
-    function salvarSessaoLocal(temaId) {
-      const sessao = {
-        aluno1: dadosDupla.aluno1,
-        aluno2: dadosDupla.aluno2,
-        temaId: temaId,
-        respostas: recuperarRespostasSalvas()
-      };
-      localStorage.setItem('tms_sessao_ativa', JSON.stringify(sessao));
-    }
-
-    function recuperarRespostasSalvas() {
-      const sessaoRaw = localStorage.getItem('tms_sessao_ativa');
-      if (!sessaoRaw) return {};
-      try {
-        const s = JSON.parse(sessaoRaw);
-        return s.respostas || {};
-      } catch (e) {
-        return {};
-      }
-    }
-
-    function salvarRespostaIndividual(qId, letra) {
-      const respostas = recuperarRespostasSalvas();
-      respostas[qId] = letra;
-      const sessaoRaw = localStorage.getItem('tms_sessao_ativa');
-      if (sessaoRaw) {
-        const s = JSON.parse(sessaoRaw);
-        s.respostas = respostas;
-        localStorage.setItem('tms_sessao_ativa', JSON.stringify(s));
-      }
-      atualizarProgresso();
-    }
-
-    function carregarQuestionario() {
-      document.getElementById('badgeTemaQuestoes').innerText = `Cenário #${String(temaAtivo.id).padStart(2, '0')} • 35 Questões`;
-      document.getElementById('tituloTemaQuestoes').innerText = temaAtivo.nome;
-      document.getElementById('subtituloDuplaQuestoes').innerText = `Dupla Operacional: ${dadosDupla.aluno1} e ${dadosDupla.aluno2}`;
-
-      const container = document.getElementById('listaQuestoesContainer');
-      container.innerHTML = "";
-
-      const respostasPrevia = recuperarRespostasSalvas();
-
-      temaAtivo.questoes.forEach((q) => {
-        const cardQ = document.createElement('div');
-        cardQ.className = "bg-slate-900 border border-slate-800 p-5 rounded-2xl space-y-3";
-        cardQ.id = `bloco_questao_${q.id}`;
-
-        const optionsHtml = ['A', 'B', 'C', 'D'].map(letra => {
-          const checked = respostasPrevia[q.id] === letra ? "checked" : "";
-          return `
-            <label class="flex items-start gap-2.5 p-2.5 bg-slate-950 rounded-xl border border-slate-800 hover:border-slate-700 cursor-pointer transition">
-              <input type="radio" name="resp_${q.id}" value="${letra}" ${checked} onchange="salvarRespostaIndividual(${q.id}, '${letra}')" class="mt-0.5 text-blue-600">
-              <span class="text-slate-300"><strong class="text-white font-mono">(${letra})</strong> ${q.opcoes[letra]}</span>
-            </label>
-          `;
-        }).join('');
-
-        cardQ.innerHTML = `
-          <div class="flex justify-between items-center border-b border-slate-800 pb-2">
-            <span class="text-xs font-mono font-bold text-blue-400">QUESTÃO ${String(q.id).padStart(2, '0')} / 35</span>
-            <span class="text-[11px] font-mono text-slate-500 uppercase">~0,285 pts</span>
-          </div>
-          <p class="text-sm font-semibold text-slate-100 leading-snug">${q.enunciado}</p>
-          <div class="space-y-2 pt-1 text-xs">${optionsHtml}</div>
-        `;
-        container.appendChild(cardQ);
-      });
-
-      atualizarProgresso();
-      alternarAba('telaQuestoes');
-    }
-
-    function atualizarProgresso() {
-      if (!temaAtivo) return;
-      let preenchidas = 0;
-      temaAtivo.questoes.forEach(q => {
-        if (document.querySelector(`input[name="resp_${q.id}"]:checked`)) preenchidas++;
-      });
-      document.getElementById('contadorRespondidas').innerText = `${preenchidas} / 35`;
-      document.getElementById('barraProgresso').style.width = `${(preenchidas / 35) * 100}%`;
-    }
-
-    function cancelarVoltar() {
-      if (confirm("Deseja realmente desistir desta tentativa? O tema será desocupado no Firebase e suas respostas locais apagadas.")) {
-        fetch(`${FIREBASE_URL}/temas_ocupados/${temaAtivo.id}.json`, { method: 'DELETE' });
-        localStorage.removeItem('tms_sessao_ativa');
-        document.getElementById('bannerSessaoRecuperada').classList.add('hidden');
-        temaAtivo = null;
-        alternarAba('telaSelecao');
-      }
-    }
-
-    document.getElementById('formQuestoes').addEventListener('submit', async function(e) {
-      e.preventDefault();
-
-      let faltantes = [];
-      temaAtivo.questoes.forEach(q => {
-        if (!document.querySelector(`input[name="resp_${q.id}"]:checked`)) faltantes.push(q.id);
-      });
-
-      if (faltantes.length > 0) {
-        alert(`Atenção: Existem ${faltantes.length} questões sem resposta! Responda todas antes de enviar.`);
-        document.getElementById(`bloco_questao_${faltantes[0]}`).scrollIntoView({ behavior: 'smooth', block: 'center' });
-        return;
-      }
-
-      let acertos = 0;
-      let diagnostico = [];
-
-      temaAtivo.questoes.forEach(q => {
-        const marcada = document.querySelector(`input[name="resp_${q.id}"]:checked`).value;
-        const correto = (marcada === q.correta);
-        if (correto) acertos++;
-
-        diagnostico.push({
-          numero: q.id,
-          enunciado: q.enunciado,
-          marcada: marcada,
-          correta: q.correta,
-          acertou: correto,
-          explicacao: q.explicacao
-        });
-      });
-
-      const notaDecimal = ((acertos / 35) * 10).toFixed(1);
-      const agoraStr = new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-
-      const registro = {
-        dupla: `${dadosDupla.aluno1} e ${dadosDupla.aluno2}`,
-        tema: temaAtivo.nome,
-        acertos: acertos,
-        nota: parseFloat(notaDecimal),
-        hora: agoraStr,
-        timestamp: Date.now()
-      };
-
-      try {
-        await fetch(`${FIREBASE_URL}/ranking.json`, {
-          method: 'POST',
-          body: JSON.stringify(registro)
-        });
-      } catch(err) {
-        console.error(err);
-      }
-
-      localStorage.removeItem('tms_sessao_ativa');
-      document.getElementById('bannerSessaoRecuperada').classList.add('hidden');
-
-      document.getElementById('resDuplaNome').innerText = registro.dupla;
-      document.getElementById('resTemaNome').innerText = registro.tema;
-      document.getElementById('resHoraEntrega').innerText = registro.hora;
-
-      const scoreEl = document.getElementById('scoreFinalNumero');
-      scoreEl.innerText = `${notaDecimal}`;
-      scoreEl.className = "text-4xl font-black font-mono " + (parseFloat(notaDecimal) >= 7.0 ? "text-emerald-400" : "text-amber-400");
-
-      const diagContainer = document.getElementById('resGabaritoDetalhado');
-      diagContainer.innerHTML = "";
-      diagnostico.forEach(d => {
-        const div = document.createElement('div');
-        div.className = "p-3 rounded-xl border " + (d.acertou ? "bg-emerald-950/20 border-emerald-800/50 text-emerald-200" : "bg-rose-950/20 border-rose-800/50 text-rose-200");
-        div.innerHTML = `
-          <div class="flex justify-between items-center mb-1">
-            <span class="font-mono font-bold">Questão ${d.numero}: ${d.acertou ? '✔️ ACERTOU' : '❌ ERROU'}</span>
-            <span class="font-mono text-[10px]">Marcou (${d.marcada}) • Correta: (${d.correta})</span>
-          </div>
-          <p class="text-[11px] text-slate-300 mb-1">${d.enunciado}</p>
-          <p class="text-[11px] italic text-slate-400 font-sans">💡 Fundamento: ${d.explicacao}</p>
-        `;
-        diagContainer.appendChild(div);
-      });
-
-      alert(`Auditoria Finalizada com Sucesso!\nNota: ${notaDecimal} / 10.0\nEnviada ao Ranking!`);
-      alternarAba('telaResultado');
-    });
-
-    function sincronizarTemasEmTempoReal() {
-      setInterval(async () => {
-        try {
-          const res = await fetch(`${FIREBASE_URL}/temas_ocupados.json`);
-          const dados = await res.json();
-          temasOcupadosCache = dados || {};
-          if (document.getElementById('telaSelecao').offsetParent !== null) {
-            renderizarPainelTemas(temasOcupadosCache);
-          }
-          if (!document.getElementById('modalAdmin').classList.contains('hidden')) {
-            atualizarListaAdmin();
-          }
-        } catch(e) {}
-      }, 3000);
-    }
-
-    function sincronizarRankingEmTempoReal() {
-      setInterval(async () => {
-        try {
-          const res = await fetch(`${FIREBASE_URL}/ranking.json`);
-          const dados = await res.json();
-          const lista = dados ? Object.values(dados) : [];
-          atualizarVisualRanking(lista);
-        } catch(e) {}
-      }, 3000);
-    }
-
-    function atualizarVisualRanking(lista) {
-      const corpo = document.getElementById('corpoTabelaRanking');
-      const aviso = document.getElementById('rankingVazioAviso');
-
-      if (!lista || lista.length === 0) {
-        corpo.innerHTML = "";
-        aviso.classList.remove('hidden');
-        return;
-      }
-      aviso.classList.add('hidden');
-
-      const ordenados = lista.sort((a, b) => b.nota - a.nota || a.timestamp - b.timestamp);
-      corpo.innerHTML = "";
-      ordenados.forEach((item, index) => {
-        const tr = document.createElement('tr');
-        tr.className = index === 0 ? "bg-amber-500/10 font-semibold" : "hover:bg-slate-800/40 transition";
-        tr.innerHTML = `
-          <td class="py-3 px-4 font-mono font-bold">${index === 0 ? '🥇 1º' : index === 1 ? '🥈 2º' : index === 2 ? '🥉 3º' : `${index + 1}º`}</td>
-          <td class="py-3 px-4 text-white font-medium">${item.dupla}</td>
-          <td class="py-3 px-4 text-slate-300 text-xs">${item.tema}</td>
-          <td class="py-3 px-4 font-mono text-xs text-slate-400">${item.hora}</td>
-          <td class="py-3 px-4 text-center font-mono text-xs text-slate-300">${item.acertos} / 35</td>
-          <td class="py-3 px-4 text-right font-mono font-black text-base ${item.nota >= 7.0 ? 'text-emerald-400' : 'text-amber-400'}">${item.nota.toFixed(1)}</td>
-        `;
-        corpo.appendChild(tr);
-      });
-    }
-  </script>
+<body>
+<div class="shell">
+<header class="hero"><div><div class="eyebrow">Engenharia de requisitos · atividade prática</div><h1>Briefing de<br><span style="color:var(--accent)">Desenvolvimento de Software</span></h1><p>Organize as primeiras informações do seu projeto, compreenda o problema que precisa ser resolvido e estruture os requisitos iniciais antes de começar a programar.</p></div><span class="tag">100% no navegador · sem cadastro</span></header>
+<div class="progressbox"><div class="progresshead"><span id="progressText">0 de 6 etapas preenchidas</span><span id="progressPct">0%</span></div><div class="track"><div class="fill" id="progressFill"></div></div></div>
+<div class="layout">
+<nav class="panel nav" aria-label="Etapas do briefing">
+<button class="active" data-step="0"><span class="num">1</span><span>Identificação<small>Aluno e projeto</small></span></button>
+<button data-step="1"><span class="num">2</span><span>Problema e objetivos<small>Necessidade do negócio</small></span></button>
+<button data-step="2"><span class="num">3</span><span>Viabilidade<small>Condições do projeto</small></span></button>
+<button data-step="3"><span class="num">4</span><span>Requisitos<small>Usuários e funcionalidades</small></span></button>
+<button data-step="4"><span class="num">5</span><span>Modelagem e validação<small>Fluxos e critérios</small></span></button>
+<button data-step="5"><span class="num">6</span><span>Revisão e documento<small>Gerar PDF</small></span></button>
+</nav>
+<main class="panel content">
+<form id="briefing" autocomplete="on">
+<section class="section active" data-section="0">
+<h2>1. Identificação do projeto</h2><p class="intro">Registre quem está desenvolvendo a proposta e qual solução está sendo estudada.</p>
+<div class="fields">
+<div class="field"><label for="aluno">Nome do aluno / equipe *</label><input id="aluno" name="aluno" required placeholder="Nome completo ou integrantes"></div>
+<div class="field"><label for="turma">Turma / curso</label><input id="turma" name="turma" placeholder="Ex.: Lógica de Programação"></div>
+<div class="field"><label for="instituicao">Instituição de ensino</label><input id="instituicao" name="instituicao" placeholder="CISS Ribas do Rio Pardo"></div>
+<div class="field"><label for="professor">Professor(a)</label><input id="professor" name="professor" placeholder="Stepherson Fontoura"></div>
+<div class="field full"><label for="nomeProjeto">Nome provisório do software *</label><input id="nomeProjeto" name="nomeProjeto" required placeholder="Ex.: Controle Fácil de Estoque"></div>
+<div class="field"><label for="area">Área de aplicação</label><select id="area" name="area"><option value="">Selecione</option><option>Educação</option><option>Saúde</option><option>Comércio e vendas</option><option>Logística</option><option>Indústria</option><option>Serviços públicos</option><option>Segurança do trabalho</option><option>Finanças</option><option>Uso pessoal</option><option>Outra</option></select></div>
+<div class="field"><label for="data">Data do levantamento</label><input type="date" id="data" name="data"></div>
+<div class="field full"><label for="resumo">Resumo da ideia <span class="hint">Em poucas linhas, explique o que você imagina construir.</span></label><textarea id="resumo" name="resumo" placeholder="Este software será utilizado para..."></textarea></div>
+</div>
+</section>
+<section class="section" data-section="1">
+<h2>2. Problema e objetivos</h2><p class="intro">Antes de pensar na tecnologia, descreva o problema real e quem é afetado por ele.</p>
+<div class="fields">
+<div class="field full"><label for="contexto">Contexto atual *</label><textarea id="contexto" name="contexto" required placeholder="Como o processo funciona hoje? Em que situação o problema aparece?"></textarea></div>
+<div class="field full"><label for="problema">Problema principal *</label><textarea id="problema" name="problema" required placeholder="Qual dificuldade, falha, demora ou necessidade será tratada?"></textarea></div>
+<div class="field full"><label for="impacto">Consequências do problema</label><textarea id="impacto" name="impacto" placeholder="Perda de tempo, erros, custos, retrabalho, falta de informação..."></textarea></div>
+<div class="field full"><label for="publico">Pessoas ou setores afetados</label><textarea id="publico" name="publico" placeholder="Quem enfrenta o problema ou será beneficiado pela solução?"></textarea></div>
+<div class="field full"><label for="objetivo">Objetivo geral do software *</label><textarea id="objetivo" name="objetivo" required placeholder="O sistema deverá contribuir para..."></textarea></div>
+<div class="field full"><label for="beneficios">Resultados esperados</label><textarea id="beneficios" name="beneficios" placeholder="O que deverá melhorar depois da implantação?"></textarea></div>
+<div class="field full"><label for="escopo">O que não fará parte da primeira versão?</label><textarea id="escopo" name="escopo" placeholder="Limites iniciais para manter o projeto viável."></textarea></div>
+</div>
+</section>
+<section class="section" data-section="2">
+<h2>3. Avaliação de necessidades e viabilidade</h2><p class="intro">Faça uma avaliação inicial. As respostas são hipóteses do aluno e deverão ser verificadas com os interessados.</p>
+<div class="fields">
+<div class="field full"><label>Viabilidade técnica <span class="hint">Existem ferramentas, equipamentos e conhecimentos para desenvolver?</span></label><select name="viabTecnica"><option value="">Selecione</option><option>Viável com os recursos disponíveis</option><option>Viável com aprendizagem ou recursos adicionais</option><option>Há impedimentos técnicos a investigar</option><option>Ainda não avaliada</option></select></div>
+<div class="field full"><label>Viabilidade financeira</label><select name="viabFinanceira"><option value="">Selecione</option><option>Baixo custo / recursos gratuitos</option><option>Exige orçamento ou aquisição</option><option>Custos ainda desconhecidos</option><option>Ainda não avaliada</option></select></div>
+<div class="field full"><label>Viabilidade operacional</label><select name="viabOperacional"><option value="">Selecione</option><option>Compatível com a rotina dos usuários</option><option>Exige treinamento ou mudança de processo</option><option>Há resistência ou barreiras a investigar</option><option>Ainda não avaliada</option></select></div>
+<div class="field full"><label>Viabilidade de cronograma</label><select name="viabPrazo"><option value="">Selecione</option><option>Possível dentro do prazo previsto</option><option>Exige redução de escopo</option><option>Prazo ainda precisa ser definido</option><option>Ainda não avaliada</option></select></div>
+<div class="field"><label for="prazo">Prazo estimado</label><input id="prazo" name="prazo" placeholder="Ex.: 4 semanas"></div>
+<div class="field"><label for="recursos">Recursos disponíveis</label><input id="recursos" name="recursos" placeholder="Ex.: computadores, internet, laboratório"></div>
+<div class="field full"><label for="riscos">Riscos, dúvidas e dependências</label><textarea id="riscos" name="riscos" placeholder="Ex.: acesso aos dados, disponibilidade dos usuários, prazo curto..."></textarea></div>
+</div>
+<div class="callout">Importante: esta etapa é uma avaliação preliminar, não uma garantia de viabilidade. Registre as informações que ainda precisam ser confirmadas.</div>
+</section>
+<section class="section" data-section="3">
+<h2>4. Levantamento e análise de requisitos</h2><p class="intro">Identifique interessados, funcionalidades e regras que deverão orientar o desenvolvimento.</p>
+<div class="fields">
+<div class="field full"><label for="stakeholders">Stakeholders / interessados</label><textarea id="stakeholders" name="stakeholders" placeholder="Quem solicita, utiliza, administra ou é impactado pelo sistema?"></textarea></div>
+<div class="field full"><label for="levantamento">Como as informações foram ou serão coletadas?</label><div class="checks"><label class="check"><input type="checkbox" name="metodo" value="Entrevistas">Entrevistas</label><label class="check"><input type="checkbox" name="metodo" value="Questionários">Questionários</label><label class="check"><input type="checkbox" name="metodo" value="Workshop / reunião">Workshop / reunião</label><label class="check"><input type="checkbox" name="metodo" value="Observação do processo">Observação do processo</label><label class="check"><input type="checkbox" name="metodo" value="Documentos existentes">Documentos existentes</label><label class="check"><input type="checkbox" name="metodo" value="Hipóteses iniciais">Hipóteses iniciais (a validar)</label></div></div>
+<div class="field full"><label>Requisitos funcionais <span class="hint">O que o sistema deverá fazer. Descreva uma função por linha.</span></label><div id="functionalList"></div><button type="button" class="add" id="addFunctional">+ Adicionar requisito funcional</button></div>
+<div class="field full"><label>Requisitos não funcionais <span class="hint">Como o sistema deverá operar: segurança, desempenho, usabilidade, compatibilidade etc.</span></label><div id="nonfunctionalList"></div><button type="button" class="add" id="addNonfunctional">+ Adicionar requisito não funcional</button></div>
+<div class="field full"><label for="regras">Regras de negócio conhecidas</label><textarea id="regras" name="regras" placeholder="Ex.: somente usuários autorizados podem aprovar cadastros."></textarea></div>
+<div class="field full"><label for="dados">Dados que o sistema precisará registrar</label><textarea id="dados" name="dados" placeholder="Ex.: nome, data, status, quantidade, histórico... Evite dados pessoais reais neste exercício."></textarea></div>
+<div class="field full"><label>Prioridade inicial das funcionalidades</label><div class="checks"><label class="check"><input type="checkbox" name="mvp" value="Cadastro e autenticação">Cadastro e autenticação</label><label class="check"><input type="checkbox" name="mvp" value="Registro e consulta de dados">Registro e consulta de dados</label><label class="check"><input type="checkbox" name="mvp" value="Pesquisa e filtros">Pesquisa e filtros</label><label class="check"><input type="checkbox" name="mvp" value="Relatórios">Relatórios</label><label class="check"><input type="checkbox" name="mvp" value="Notificações">Notificações</label><label class="check"><input type="checkbox" name="mvp" value="Integração com outros sistemas">Integração com outros sistemas</label></div></div>
+</div>
+</section>
+<section class="section" data-section="4">
+<h2>5. Modelagem e validação</h2><p class="intro">Prepare o caminho para representar os processos e verificar se os requisitos estão corretos.</p>
+<div class="fields">
+<div class="field full"><label for="fluxo">Fluxo básico do processo</label><textarea id="fluxo" name="fluxo" placeholder="Descreva em ordem: quem inicia, o que informa, o que o sistema faz e qual resultado apresenta."></textarea></div>
+<div class="field full"><label for="entradas">Entradas e saídas esperadas</label><textarea id="entradas" name="entradas" placeholder="Entradas: dados informados pelo usuário. Saídas: confirmação, listagem, relatório etc."></textarea></div>
+<div class="field full"><label>Modelos a elaborar na próxima etapa</label><div class="checks"><label class="check"><input type="checkbox" name="modelos" value="Diagrama de casos de uso">Diagrama de casos de uso</label><label class="check"><input type="checkbox" name="modelos" value="Fluxograma">Fluxograma</label><label class="check"><input type="checkbox" name="modelos" value="Modelo de dados">Modelo de dados</label><label class="check"><input type="checkbox" name="modelos" value="Protótipo de telas">Protótipo de telas</label><label class="check"><input type="checkbox" name="modelos" value="Diagrama UML">Diagrama UML</label></div></div>
+<div class="field full"><label for="validacao">Como confirmar que a solução atende à necessidade?</label><textarea id="validacao" name="validacao" placeholder="Ex.: demonstrar um cenário de uso ao solicitante e obter aprovação."></textarea></div>
+<div class="field full"><label for="pendencias">Questões pendentes para perguntar aos usuários</label><textarea id="pendencias" name="pendencias" placeholder="Liste dúvidas ainda sem resposta."></textarea></div>
+<div class="field full"><label for="aceite">Critérios iniciais de aceitação</label><textarea id="aceite" name="aceite" placeholder="Quais resultados observáveis indicarão que a primeira versão funciona?"></textarea></div>
+</div>
+</section>
+<section class="section" data-section="5" id="review">
+<h2>6. Revisão e geração do documento</h2><p class="intro">Confira o resumo do briefing. O documento será uma versão inicial para discussão, refinamento e validação com os interessados.</p>
+<div class="callout" id="reviewStatus">Preencha as informações principais e revise o conteúdo antes de gerar o PDF.</div>
+<div class="preview" id="preview"><p>O resumo do documento aparecerá aqui.</p></div>
+<div class="actions"><button type="button" class="btn" id="backReview">← Voltar para editar</button><div style="display:flex;gap:9px;flex-wrap:wrap"><button type="button" class="btn" id="saveBtn">Salvar rascunho</button><button type="button" class="btn" id="jsonBtn">Exportar dados (.json)</button><button type="button" class="btn primary" id="pdfBtn">Gerar / imprimir PDF ↗</button></div></div>
+</section>
+<div class="actions" id="stepActions"><button type="button" class="btn" id="prevBtn" disabled>← Etapa anterior</button><div style="display:flex;gap:9px;flex-wrap:wrap"><button type="button" class="btn" id="clearBtn">Limpar formulário</button><button type="button" class="btn primary" id="nextBtn">Próxima etapa →</button></div></div>
+</form>
+</main></div>
+<div class="foot">Ferramenta didática de apoio à Engenharia de Requisitos - Desenvolvida pelo Prof. Stepherson Fontoura - Analista de Sistemas - Os dados permanecem neste navegador, salvo quando o usuário exportar.</div>
+</div><div class="toast" id="toast" role="status"></div>
+<script>
+(function(){
+const form=document.getElementById('briefing'), sections=[...document.querySelectorAll('.section')], nav=[...document.querySelectorAll('.nav button')];
+let step=0;
+const $=id=>document.getElementById(id);
+function toast(msg){const t=$('toast');t.textContent=msg;t.style.display='block';setTimeout(()=>t.style.display='none',2600)}
+function go(n){step=Math.max(0,Math.min(5,n));sections.forEach((s,i)=>s.classList.toggle('active',i===step));nav.forEach((b,i)=>b.classList.toggle('active',i===step));$('prevBtn').disabled=step===0;$('nextBtn').textContent=step===4?'Revisar documento →':'Próxima etapa →';$('stepActions').style.display=step===5?'none':'flex';if(step===5)renderPreview();window.scrollTo({top:0,behavior:'smooth'});updateProgress()}
+nav.forEach(b=>b.addEventListener('click',()=>go(+b.dataset.step)));
+$('prevBtn').addEventListener('click',()=>go(step-1));
+$('nextBtn').addEventListener('click',()=>{if(step===0){for(const id of ['aluno','nomeProjeto']){const el=$(id);if(!el.value.trim()){el.focus();el.reportValidity();return}}}if(step===1){for(const id of ['contexto','problema','objetivo']){const el=$(id);if(!el.value.trim()){el.focus();el.reportValidity();return}}}go(step+1)});
+$('backReview').addEventListener('click',()=>go(0));
+function addReq(kind,value='',priority='Média'){const box=$(kind==='functional'?'functionalList':'nonfunctionalList');const row=document.createElement('div');row.className='reqrow';row.innerHTML='<input aria-label="Descrição do requisito" placeholder="'+(kind==='functional'?'Ex.: O sistema deverá permitir cadastrar produtos.':'Ex.: O sistema deverá funcionar em celular e computador.')+'" value=""><select aria-label="Prioridade"><option>Alta</option><option selected>Média</option><option>Baixa</option></select><button type="button" class="remove" aria-label="Remover requisito">Remover</button>';row.querySelector('input').value=value;row.querySelector('select').value=priority;row.querySelector('.remove').addEventListener('click',()=>{row.remove();updateProgress()});row.querySelectorAll('input,select').forEach(el=>el.addEventListener('input',updateProgress));box.appendChild(row);updateProgress()}
+$('addFunctional').addEventListener('click',()=>addReq('functional'));$('addNonfunctional').addEventListener('click',()=>addReq('nonfunctional'));
+addReq('functional');addReq('nonfunctional');
+function val(name){const e=form.elements[name];if(!e)return '';if(e instanceof RadioNodeList)return e.value;return e.value||''}
+function checked(name){return [...form.querySelectorAll('input[name="'+name+'"]:checked')].map(x=>x.value)}
+function reqs(id){return [...$(id).querySelectorAll('.reqrow')].map(r=>({descricao:r.querySelector('input').value.trim(),prioridade:r.querySelector('select').value})).filter(x=>x.descricao)}
+function allData(){const d={};[...form.querySelectorAll('input:not([type=checkbox]),textarea,select')].forEach(e=>{if(e.name)d[e.name]=e.value});d.metodos=checked('metodo');d.mvp=checked('mvp');d.modelos=checked('modelos');d.requisitosFuncionais=reqs('functionalList');d.requisitosNaoFuncionais=reqs('nonfunctionalList');d.geradoEm=new Date().toLocaleString('pt-BR');return d}
+function updateProgress(){const d=allData();const fields=['aluno','nomeProjeto','contexto','problema','objetivo'];const filled=fields.filter(k=>(d[k]||'').trim()).length;const pct=Math.round(filled/fields.length*100);$('progressFill').style.width=pct+'%';$('progressPct').textContent=pct+'%';$('progressText').textContent=filled+' de '+fields.length+' informações essenciais preenchidas';nav.forEach((b,i)=>{const s=sections[i];const has=[...s.querySelectorAll('input:not([type=checkbox]),textarea,select')].some(e=>e.value.trim());b.classList.toggle('done',has)})}
+form.addEventListener('input',updateProgress);form.addEventListener('change',updateProgress);
+function esc(s){return String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function lines(s){return esc(s).replace(/\n/g,'<br>')||'<span style="color:#64748b">Não informado.</span>'}
+function list(items){return items.length?'<ul>'+items.map(x=>'<li>'+esc(x)+'</li>').join('')+'</ul>':'<p>Não informado.</p>'}
+function reqTable(items){return items.length?'<table><thead><tr><th>Descrição</th><th>Prioridade</th></tr></thead><tbody>'+items.map(x=>'<tr><td>'+esc(x.descricao)+'</td><td>'+esc(x.prioridade)+'</td></tr>').join('')+'</tbody></table>':'<p>Não informado.</p>'}
+function renderPreview(){const d=allData();$('reviewStatus').textContent='Informações essenciais preenchidas: '+['aluno','nomeProjeto','contexto','problema','objetivo'].filter(k=>(d[k]||'').trim()).length+' de 5. Campos em branco serão identificados como não informados no documento.';
+$('preview').innerHTML='<article class="doc"><div style="border-bottom:3px solid #0e7490;padding-bottom:14px;margin-bottom:18px"><div style="font-size:11px;letter-spacing:2px;color:#0e7490;font-weight:bold">ENGENHARIA DE REQUISITOS</div><h1 style="font-size:25px;margin:8px 0">Documento Inicial de Análise e Especificação de Software</h1><p style="margin:0;color:#475569">Briefing do projeto · Versão inicial para levantamento e validação</p></div>'+
+'<h2>1. Identificação</h2><p><b>Projeto:</b> '+lines(d.nomeProjeto)+'<br><b>Aluno/equipe:</b> '+lines(d.aluno)+'<br><b>Turma/curso:</b> '+lines(d.turma)+'<br><b>Instituição:</b> '+lines(d.instituicao)+'<br><b>Professor:</b> '+lines(d.professor)+'<br><b>Área:</b> '+lines(d.area)+'<br><b>Data:</b> '+lines(d.data)+'</p><h3>Resumo da ideia</h3><p>'+lines(d.resumo)+'</p>'+
+'<h2>2. Problema e objetivos</h2><h3>Contexto atual</h3><p>'+lines(d.contexto)+'</p><h3>Problema principal</h3><p>'+lines(d.problema)+'</p><h3>Consequências</h3><p>'+lines(d.impacto)+'</p><h3>Público afetado</h3><p>'+lines(d.publico)+'</p><h3>Objetivo geral</h3><p>'+lines(d.objetivo)+'</p><h3>Resultados esperados</h3><p>'+lines(d.beneficios)+'</p><h3>Limites iniciais de escopo</h3><p>'+lines(d.escopo)+'</p>'+
+'<h2>3. Avaliação preliminar de viabilidade</h2><p><b>Técnica:</b> '+lines(d.viabTecnica)+'<br><b>Financeira:</b> '+lines(d.viabFinanceira)+'<br><b>Operacional:</b> '+lines(d.viabOperacional)+'<br><b>Cronograma:</b> '+lines(d.viabPrazo)+'<br><b>Prazo estimado:</b> '+lines(d.prazo)+'<br><b>Recursos disponíveis:</b> '+lines(d.recursos)+'</p><h3>Riscos, dúvidas e dependências</h3><p>'+lines(d.riscos)+'</p>'+
+'<h2>4. Levantamento e análise de requisitos</h2><h3>Stakeholders / interessados</h3><p>'+lines(d.stakeholders)+'</p><h3>Métodos de levantamento</h3>'+list(d.metodos)+'<h3>Requisitos funcionais</h3>'+reqTable(d.requisitosFuncionais)+'<h3>Requisitos não funcionais</h3>'+reqTable(d.requisitosNaoFuncionais)+'<h3>Regras de negócio</h3><p>'+lines(d.regras)+'</p><h3>Dados necessários</h3><p>'+lines(d.dados)+'</p><h3>Funcionalidades candidatas ao MVP</h3>'+list(d.mvp)+
+'<h2>5. Modelagem e validação</h2><h3>Fluxo básico do processo</h3><p>'+lines(d.fluxo)+'</p><h3>Entradas e saídas</h3><p>'+lines(d.entradas)+'</p><h3>Modelos a elaborar</h3>'+list(d.modelos)+'<h3>Estratégia de validação</h3><p>'+lines(d.validacao)+'</p><h3>Questões pendentes</h3><p>'+lines(d.pendencias)+'</p><h3>Critérios iniciais de aceitação</h3><p>'+lines(d.aceite)+'</p>'+
+'<h2>6. Próximas ações recomendadas</h2><ol><li>Confirmar o problema e os objetivos com os usuários interessados.</li><li>Investigar as questões pendentes e registrar eventuais conflitos de requisitos.</li><li>Priorizar requisitos e definir o escopo da primeira versão (MVP).</li><li>Elaborar os diagramas e protótipos selecionados.</li><li>Validar e aprovar a especificação antes do desenvolvimento.</li></ol><h2>7. Validação do documento</h2><p>Responsável pelo levantamento: ______________________________________</p><p>Representante do usuário/solicitante: _________________________________</p><p>Data e observações: __________________________________________________</p><p style="font-size:10px;color:#64748b;border-top:1px solid #cbd5e1;padding-top:10px">Documento didático inicial. Os requisitos e a viabilidade devem ser confirmados com os stakeholders. Campos não preenchidos não representam requisitos aprovados. Gerado em '+esc(d.geradoEm)+'.</p></article>';
+}
+function save(){try{localStorage.setItem('briefingSoftwareAluno',JSON.stringify(allData()));toast('Rascunho salvo neste navegador.')}catch(e){toast('Não foi possível salvar localmente neste navegador.')}}
+$('saveBtn').addEventListener('click',save);
+$('clearBtn').addEventListener('click',()=>{if(confirm('Deseja apagar todos os dados preenchidos neste formulário?')){form.reset();$('functionalList').innerHTML='';$('nonfunctionalList').innerHTML='';addReq('functional');addReq('nonfunctional');try{localStorage.removeItem('briefingSoftwareAluno')}catch(e){}go(0);toast('Formulário limpo.')}});
+function download(name,content,type){const blob=new Blob([content],{type});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=name;document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(url)}
+$('jsonBtn').addEventListener('click',()=>{const name=(val('nomeProjeto')||'projeto-software').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');download(name+'-briefing.json',JSON.stringify(allData(),null,2),'application/json;charset=utf-8')});
+$('pdfBtn').addEventListener('click',()=>{renderPreview();const win=window.open('','_blank');if(!win){alert('O navegador bloqueou a janela de impressão. Permita pop-ups para este site e tente novamente.');return}const content=$('preview').innerHTML;win.document.write('<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><title>Documento Inicial de Software</title><style>body{font:12px/1.55 Arial,sans-serif;color:#111827;max-width:850px;margin:25px auto;padding:0 25px}h1{font-size:24px}h2{font-size:17px;border-bottom:1px solid #0e7490;padding-bottom:4px;margin-top:25px;color:#0e5267}h3{font-size:13px;margin:14px 0 4px}p{margin:5px 0 10px}ul,ol{padding-left:22px}li{margin:3px 0}table{width:100%;border-collapse:collapse;margin:8px 0 16px}td,th{border:1px solid #cbd5e1;padding:7px;text-align:left;vertical-align:top}th{background:#e2e8f0}@page{size:A4;margin:17mm}article{overflow-wrap:anywhere}.doc>div:first-child{border-bottom:3px solid #0e7490;padding-bottom:14px;margin-bottom:18px}@media print{body{margin:0;padding:0}}</style></head><body>'+content+'<script>window.onload=()=>setTimeout(()=>window.print(),300);<\\/script></body></html>');win.document.close()});
+try{const saved=localStorage.getItem('briefingSoftwareAluno');if(saved){const d=JSON.parse(saved);Object.entries(d).forEach(([k,v])=>{const el=form.elements[k];if(el&&typeof v==='string')el.value=v});(d.requisitosFuncionais||[]).forEach((x,i)=>{if(i===0){const r=$('functionalList').querySelector('.reqrow');if(r){r.querySelector('input').value=x.descricao;r.querySelector('select').value=x.prioridade}}else addReq('functional',x.descricao,x.prioridade)});(d.requisitosNaoFuncionais||[]).forEach((x,i)=>{if(i===0){const r=$('nonfunctionalList').querySelector('.reqrow');if(r){r.querySelector('input').value=x.descricao;r.querySelector('select').value=x.prioridade}}else addReq('nonfunctional',x.descricao,x.prioridade)});['metodos','mvp','modelos'].forEach(k=>(d[k]||[]).forEach(v=>{const el=[...form.querySelectorAll('input[type=checkbox]')].find(x=>x.name===(k==='metodos'?'metodo':k)&&x.value===v);if(el)el.checked=true}));updateProgress()}}catch(e){}
+const date=$('data');if(!date.value)date.value=new Date().toISOString().slice(0,10);updateProgress();
+})();
+</script>
 </body>
 </html>

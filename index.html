@@ -3,51 +3,93 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Projetos da Turma - SENAI</title>
+    <title>Projetos - Lógica de Programação | SENAI Ribas</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 </head>
-<body class="bg-gray-100 min-h-screen p-6 font-sans">
-    <div class="max-w-5xl mx-auto">
+<body class="bg-gray-50 flex flex-col min-h-screen font-sans">
+    
+    <!-- Cabeçalho Institucional -->
+    <header class="bg-[#002776] border-b-4 border-[#E3000F] text-white py-8 px-4 shadow-md">
+        <div class="max-w-6xl mx-auto text-center">
+            <h1 class="text-3xl md:text-4xl font-extrabold uppercase tracking-wide">
+                Página de Projetos
+            </h1>
+            <p class="text-lg md:text-xl mt-2 font-light text-blue-100">
+                1ª Turma de Lógica de Programação do SENAI Ribas
+            </p>
+        </div>
+    </header>
+
+    <main class="flex-grow max-w-6xl mx-auto w-full p-6 my-8">
         
-        <div class="bg-white p-6 rounded-lg shadow-md mb-10 max-w-lg mx-auto">
-            <h2 class="text-2xl font-bold mb-4 text-center text-gray-800">Registrar Projeto</h2>
-            <form id="projectForm" class="space-y-4">
+        <!-- Formulário de Submissão -->
+        <div class="bg-white p-8 rounded-xl shadow-lg border border-gray-200 mb-12 max-w-2xl mx-auto">
+            <div class="flex items-center justify-center mb-6">
+                <i class="fa-solid fa-cloud-arrow-up text-3xl text-[#E3000F] mr-3"></i>
+                <h2 class="text-2xl font-bold text-[#002776]">Registrar Projeto</h2>
+            </div>
+            
+            <form id="projectForm" class="space-y-5">
                 <div>
-                    <label class="block text-sm font-medium text-gray-700">Nome do Aluno</label>
-                    <input type="text" id="nome" required class="mt-1 w-full border border-gray-300 p-2 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">Nome do Aluno</label>
+                    <input type="text" id="nome" required class="w-full border border-gray-300 p-3 rounded-lg focus:ring-2 focus:ring-[#002776] focus:border-[#002776] transition-all bg-gray-50">
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-gray-700">Link do GitHub Pages</label>
-                    <input type="url" id="link" required placeholder="https://aluno.github.io/projeto" class="mt-1 w-full border border-gray-300 p-2 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">Nome do Projeto</label>
+                    <input type="text" id="nomeProjeto" required placeholder="Ex: Simulador de Logística" class="w-full border border-gray-300 p-3 rounded-lg focus:ring-2 focus:ring-[#002776] focus:border-[#002776] transition-all bg-gray-50">
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-gray-700">Foto 3x4 (Tire uma selfie)</label>
-                    <!-- O atributo capture="user" força a abertura da câmera frontal no celular -->
-                    <input type="file" id="foto" accept="image/*" capture="user" required class="mt-1 w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">Link do Projeto (GitHub Pages)</label>
+                    <input type="url" id="link" required placeholder="https://aluno.github.io/projeto" class="w-full border border-gray-300 p-3 rounded-lg focus:ring-2 focus:ring-[#002776] focus:border-[#002776] transition-all bg-gray-50">
                 </div>
-                <button type="submit" id="btnSubmit" class="w-full bg-blue-600 text-white font-bold py-2 px-4 rounded-md hover:bg-blue-700 transition">
-                    Enviar Projeto
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">Foto do Aluno</label>
+                    <input type="file" id="foto" accept="image/*" capture="user" required class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-[#002776] hover:file:bg-blue-100 cursor-pointer border border-gray-200 p-2 rounded-lg bg-gray-50">
+                </div>
+                <button type="submit" id="btnSubmit" class="w-full bg-[#E3000F] text-white font-bold py-3 px-4 rounded-lg hover:bg-red-700 transition-colors shadow-md mt-4 flex justify-center items-center">
+                    <i class="fa-solid fa-paper-plane mr-2"></i> Enviar Projeto
                 </button>
             </form>
         </div>
 
-        <h2 class="text-2xl font-bold mb-6 text-gray-800 border-b pb-2">Galeria de Projetos</h2>
-        <div id="gallery" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            <p class="text-gray-500 col-span-full text-center" id="loadingMsg">Carregando projetos...</p>
+        <!-- Divisor -->
+        <div class="flex items-center mb-8">
+            <div class="flex-grow h-px bg-gray-300"></div>
+            <h2 class="px-6 text-3xl font-bold text-[#002776] uppercase tracking-wider">Galeria de Trabalhos</h2>
+            <div class="flex-grow h-px bg-gray-300"></div>
         </div>
-    </div>
+
+        <!-- Galeria -->
+        <div id="gallery" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <p class="text-gray-500 col-span-full text-center text-lg animate-pulse" id="loadingMsg">
+                <i class="fa-solid fa-spinner fa-spin mr-2"></i> Carregando projetos da turma...
+            </p>
+        </div>
+    </main>
+
+    <!-- Rodapé -->
+    <footer class="bg-[#002776] text-white py-6 border-t border-blue-800 mt-auto">
+        <div class="max-w-6xl mx-auto px-4 text-center">
+            <p class="text-blue-200 mb-1">Desenvolvido para atividades acadêmicas</p>
+            <p class="font-semibold text-lg text-white">
+                Responsável Técnico e Professor: <span class="text-yellow-400">Prof. Stepherson Fontoura</span>
+            </p>
+        </div>
+    </footer>
 
     <script>
-        // URL da sua implantação inserida
         const API_URL = 'https://script.google.com/macros/s/AKfycbzoP1i833CqQZHCZZm9epH5AMjxXmsrwVwBNjCSxsqMLbKYEqVLQjoC4BNjWKrI4BCItw/exec';
 
         document.getElementById('projectForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const btn = document.getElementById('btnSubmit');
-            btn.innerText = 'Enviando (pode levar alguns segundos)...';
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i> Processando envio...';
             btn.disabled = true;
+            btn.classList.add('opacity-75');
 
             const nome = document.getElementById('nome').value;
+            const nomeProjeto = document.getElementById('nomeProjeto').value;
             const link = document.getElementById('link').value;
             const file = document.getElementById('foto').files[0];
 
@@ -58,15 +100,15 @@
                 try {
                     const res = await fetch(API_URL, {
                         method: 'POST',
-                        body: JSON.stringify({ nome, link, foto: base64String }),
+                        body: JSON.stringify({ nome, nomeProjeto, link, foto: base64String }),
                         headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                        redirect: 'follow' // Essencial para o Google Apps Script não bloquear o retorno
+                        redirect: 'follow'
                     });
                     
                     const responseData = await res.json();
                     
                     if(responseData.status === "sucesso") {
-                        alert('Projeto registrado com sucesso!');
+                        alert('Sucesso! O projeto foi registrado.');
                         document.getElementById('projectForm').reset();
                         loadProjects();
                     } else {
@@ -74,10 +116,11 @@
                     }
                 } catch (err) {
                     console.error(err);
-                    alert('Erro na comunicação com a planilha. Verifique sua internet.');
+                    alert('Erro de comunicação. Verifique a sua ligação à internet.');
                 } finally {
-                    btn.innerText = 'Enviar Projeto';
+                    btn.innerHTML = '<i class="fa-solid fa-paper-plane mr-2"></i> Enviar Projeto';
                     btn.disabled = false;
+                    btn.classList.remove('opacity-75');
                 }
             };
             reader.readAsDataURL(file);
@@ -92,32 +135,49 @@
                 gallery.innerHTML = '';
                 
                 if(!data || data.length === 0) {
-                    gallery.innerHTML = '<p class="text-gray-500 col-span-full text-center">Nenhum projeto registrado ainda.</p>';
+                    gallery.innerHTML = '<div class="col-span-full bg-white p-8 rounded-lg shadow text-center border border-gray-200"><p class="text-gray-500 text-lg">Ainda não existem projetos registados nesta turma.</p></div>';
                     return;
                 }
 
-                data.forEach(aluno => {
+                data.reverse().forEach(aluno => { // .reverse() para mostrar os mais recentes primeiro
                     const card = document.createElement('div');
-                    card.className = 'bg-white rounded-lg shadow-lg overflow-hidden flex flex-col items-center p-4 border border-gray-200';
-                    const thumbnailUrl = `https://image.thum.io/get/width/400/crop/600/${aluno.link}`;
+                    card.className = 'bg-white rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 overflow-hidden flex flex-col border border-gray-200 relative group';
+                    
+                    const thumbnailUrl = `https://image.thum.io/get/width/600/crop/600/${aluno.link}`;
 
                     card.innerHTML = `
-                        <div class="w-24 h-32 mb-3">
-                            <img src="${aluno.foto}" alt="Foto de ${aluno.nome}" class="w-full h-full object-cover rounded shadow border border-gray-300">
+                        <!-- Miniatura do Site -->
+                        <div class="h-40 w-full overflow-hidden relative bg-gray-100 border-b border-gray-200">
+                            <img src="${thumbnailUrl}" alt="Preview do site" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy">
+                            <div class="absolute inset-0 bg-[#002776] bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-300"></div>
                         </div>
-                        <h3 class="text-lg font-bold text-gray-800 text-center mb-1">${aluno.nome}</h3>
-                        <a href="${aluno.link}" target="_blank" class="text-blue-600 text-sm hover:underline mb-3 truncate w-full text-center">
-                            Acessar Projeto
-                        </a>
-                        <div class="w-full mt-auto rounded overflow-hidden border border-gray-300 relative bg-gray-50">
-                            <span class="absolute top-1 left-1 bg-black bg-opacity-60 text-white text-[10px] px-1 rounded">Preview</span>
-                            <img src="${thumbnailUrl}" alt="Preview do site" class="w-full h-32 object-cover" loading="lazy">
+                        
+                        <!-- Foto do Aluno Sobreposta -->
+                        <div class="absolute top-24 left-1/2 transform -translate-x-1/2">
+                            <img src="${aluno.foto}" alt="Foto de ${aluno.nome}" class="w-24 h-24 object-cover rounded-full border-4 border-white shadow-md bg-white">
+                        </div>
+
+                        <!-- Dados do Projeto -->
+                        <div class="p-6 pt-12 flex flex-col flex-grow text-center">
+                            <h3 class="text-xl font-bold text-[#002776] mb-1">${aluno.nome}</h3>
+                            <p class="text-[#E3000F] font-semibold text-sm uppercase tracking-wide mb-4">${aluno.nomeProjeto}</p>
+                            
+                            <div class="bg-gray-50 p-3 rounded border border-gray-200 mb-6 text-left break-all">
+                                <span class="text-xs font-bold text-gray-500 uppercase block mb-1">Endereço Web:</span>
+                                <a href="${aluno.link}" target="_blank" class="text-sm text-blue-600 hover:text-blue-800 hover:underline">
+                                    ${aluno.link}
+                                </a>
+                            </div>
+                            
+                            <a href="${aluno.link}" target="_blank" class="mt-auto block w-full bg-[#002776] text-white font-semibold py-2 px-4 rounded hover:bg-blue-900 transition-colors shadow">
+                                <i class="fa-solid fa-arrow-up-right-from-square mr-2"></i> Acessar Projeto
+                            </a>
                         </div>
                     `;
                     gallery.appendChild(card);
                 });
             } catch (err) {
-                gallery.innerHTML = '<p class="text-red-500 col-span-full text-center">Erro ao carregar os dados.</p>';
+                gallery.innerHTML = '<p class="text-red-500 col-span-full text-center p-8 bg-red-50 rounded-lg border border-red-200">Erro ao carregar os projetos. Por favor, atualize a página.</p>';
             }
         }
 

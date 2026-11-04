@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Projetos da Turma</title>
+    <title>Projetos da Turma - SENAI</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gray-100 min-h-screen p-6 font-sans">
@@ -21,8 +21,9 @@
                     <input type="url" id="link" required placeholder="https://aluno.github.io/projeto" class="mt-1 w-full border border-gray-300 p-2 rounded-md focus:ring-blue-500 focus:border-blue-500">
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-gray-700">Foto (Selfie 3x4)</label>
-                    <input type="file" id="foto" accept="image/*" required class="mt-1 w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
+                    <label class="block text-sm font-medium text-gray-700">Foto 3x4 (Tire uma selfie)</label>
+                    <!-- O atributo capture="user" força a abertura da câmera frontal no celular -->
+                    <input type="file" id="foto" accept="image/*" capture="user" required class="mt-1 w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
                 </div>
                 <button type="submit" id="btnSubmit" class="w-full bg-blue-600 text-white font-bold py-2 px-4 rounded-md hover:bg-blue-700 transition">
                     Enviar Projeto
@@ -32,19 +33,18 @@
 
         <h2 class="text-2xl font-bold mb-6 text-gray-800 border-b pb-2">Galeria de Projetos</h2>
         <div id="gallery" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            <!-- Os cards dos alunos serão carregados aqui -->
             <p class="text-gray-500 col-span-full text-center" id="loadingMsg">Carregando projetos...</p>
         </div>
     </div>
 
     <script>
-        // COLOQUE AQUI A URL GERADA PELO GOOGLE APPS SCRIPT
+        // URL da sua implantação inserida
         const API_URL = 'https://script.google.com/macros/s/AKfycbzoP1i833CqQZHCZZm9epH5AMjxXmsrwVwBNjCSxsqMLbKYEqVLQjoC4BNjWKrI4BCItw/exec';
 
         document.getElementById('projectForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const btn = document.getElementById('btnSubmit');
-            btn.innerText = 'Enviando...';
+            btn.innerText = 'Enviando (pode levar alguns segundos)...';
             btn.disabled = true;
 
             const nome = document.getElementById('nome').value;
@@ -56,16 +56,25 @@
                 const base64String = reader.result;
                 
                 try {
-                    await fetch(API_URL, {
+                    const res = await fetch(API_URL, {
                         method: 'POST',
                         body: JSON.stringify({ nome, link, foto: base64String }),
-                        headers: { 'Content-Type': 'text/plain;charset=utf-8' } // text/plain evita o erro de CORS no preflight do Google
+                        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                        redirect: 'follow' // Essencial para o Google Apps Script não bloquear o retorno
                     });
-                    alert('Projeto registrado com sucesso!');
-                    document.getElementById('projectForm').reset();
-                    loadProjects();
+                    
+                    const responseData = await res.json();
+                    
+                    if(responseData.status === "sucesso") {
+                        alert('Projeto registrado com sucesso!');
+                        document.getElementById('projectForm').reset();
+                        loadProjects();
+                    } else {
+                        alert('Erro reportado pelo servidor: ' + responseData.error);
+                    }
                 } catch (err) {
-                    alert('Erro ao enviar. Tente novamente.');
+                    console.error(err);
+                    alert('Erro na comunicação com a planilha. Verifique sua internet.');
                 } finally {
                     btn.innerText = 'Enviar Projeto';
                     btn.disabled = false;
@@ -82,7 +91,7 @@
                 
                 gallery.innerHTML = '';
                 
-                if(data.length === 0) {
+                if(!data || data.length === 0) {
                     gallery.innerHTML = '<p class="text-gray-500 col-span-full text-center">Nenhum projeto registrado ainda.</p>';
                     return;
                 }
@@ -90,8 +99,6 @@
                 data.forEach(aluno => {
                     const card = document.createElement('div');
                     card.className = 'bg-white rounded-lg shadow-lg overflow-hidden flex flex-col items-center p-4 border border-gray-200';
-                    
-                    // URL do Thum.io para gerar a miniatura do site do aluno
                     const thumbnailUrl = `https://image.thum.io/get/width/400/crop/600/${aluno.link}`;
 
                     card.innerHTML = `
@@ -114,7 +121,6 @@
             }
         }
 
-        // Carrega os projetos ao abrir a página
         loadProjects();
     </script>
 </body>
